@@ -8,33 +8,28 @@
         * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
         body { background-color: #f4f7f6; color: #333; }
         
-        /* شاشة تسجيل الدخول */
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #004d40; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 90%; max-width: 350px; }
-        .login-box h1 { color: #004d40; margin-bottom: 20px; }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; text-align: center; }
-        .login-box button { width: 100%; padding: 12px; background: #004d40; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; }
-        .login-error { color: red; margin-top: 10px; font-size: 14px; display: none; }
-        
-        /* بقية التطبيق */
-        .hidden { display: none; }
-        header { background-color: #004d40; color: white; padding: 15px; text-align: center; position: relative; }
+        header { background-color: #004d40; color: white; padding: 15px; text-align: center; }
         h1 { font-size: 22px; }
+        
         nav { display: flex; overflow-x: auto; background-color: #00695c; position: sticky; top: 0; z-index: 100; }
         nav button { flex: 1; padding: 12px 5px; background: none; border: none; color: white; font-size: 14px; cursor: pointer; min-width: 80px; }
         nav button.active { background-color: #004d40; border-bottom: 3px solid #ffd54f; }
+        
         main { padding: 15px; margin-bottom: 60px; }
         .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
         .card h2 { font-size: 18px; margin-bottom: 10px; color: #00695c; }
         .input-group { margin-bottom: 10px; }
         .input-group label { display: block; font-size: 14px; margin-bottom: 5px; }
         .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        
         .btn { padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 5px; display: block; width: 100%; text-align: center; }
         .btn-green { background-color: #2e7d32; color: white; }
         .btn-blue { background-color: #1565c0; color: white; }
         .btn-red { background-color: #c62828; color: white; }
         .btn-grey { background-color: #e0e0e0; color: black; }
         .btn-small { display: inline-block; width: auto; padding: 8px 15px; font-size: 12px; margin-top: 5px; }
+        
         .dashboard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-card { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 4px solid #ccc; }
         .stat-card.green { border-top-color: #2e7d32; }
@@ -43,38 +38,34 @@
         .stat-card.blue { border-top-color: #1565c0; }
         .stat-card h3 { font-size: 14px; }
         .stat-card p { font-size: 24px; font-weight: bold; }
+        
         .list-item { border-bottom: 1px solid #eee; padding: 10px 0; }
         .list-item:last-child { border-bottom: none; }
+        
         .floating-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
         .floating-btn { width: 60px; height: 60px; border-radius: 50%; border: none; color: white; font-size: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
         .modal-content h3 { margin-bottom: 15px; }
+        
         .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; color: white; }
         .status-normal { background-color: #2e7d32; }
         .status-expired { background-color: #c62828; }
         .status-low { background-color: #ef6c00; }
+        
+        .hidden { display: none; }
+        
+        .language-switch { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        
         .action-row { display: flex; gap: 10px; margin-top: 10px; }
-        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول -->
-<div id="loginScreen">
-    <div class="login-box">
-        <h1>نظام المخزون</h1>
-        <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور">
-        <button onclick="checkPassword()">دخول</button>
-        <div class="login-error" id="loginError">كلمة المرور غير صحيحة</div>
-    </div>
-</div>
-
-<!-- محتوى التطبيق (مخفي حتى تسجيل الدخول) -->
-<div id="appContent" class="hidden">
 <header>
-    <button class="logout-btn" onclick="logout()">خروج</button>
-    <h1>نظام إدارة المخزون الطبي</h1>
+    <button class="language-switch" id="langSwitch">English</button>
+    <h1 id="appTitle">نظام إدارة المخزون الطبي</h1>
 </header>
 
 <nav>
@@ -88,6 +79,7 @@
 </nav>
 
 <main>
+    <!-- Dashboard Section -->
     <section id="dashboard">
         <div class="dashboard-stats">
             <div class="stat-card blue"><h3>عدد الأصناف</h3><p id="statItems">0</p></div>
@@ -97,12 +89,14 @@
             <div class="stat-card red"><h3>منتهي الصلاحية</h3><p id="statExpired">0</p></div>
             <div class="stat-card red"><h3>نقص المخزون</h3><p id="statLow">0</p></div>
         </div>
+        
         <div class="card" style="margin-top: 15px;">
             <h2>أحدث العمليات</h2>
             <div id="recentTransactions"></div>
         </div>
     </section>
 
+    <!-- Inventory Section -->
     <section id="inventory" class="hidden">
         <div class="card">
             <input type="text" id="searchInput" placeholder="بحث بالاسم، رقم الدفعة، التصنيف..." oninput="searchItems()" style="margin-bottom: 10px;">
@@ -111,38 +105,81 @@
         </div>
     </section>
 
+    <!-- Add Stock Section -->
     <section id="add" class="hidden">
         <div class="card">
             <h2>إضافة مخزون جديد</h2>
-            <div class="input-group"><label>اسم الصنف</label><input type="text" id="newItemName"></div>
-            <div class="input-group"><label>التصنيف</label><input type="text" id="newItemCategory"></div>
-            <div class="input-group"><label>الوحدة</label><select id="newItemUnit"><option>وحدة</option><option>علبة</option><option>قارورة</option><option>حقنة</option><option>قطعة</option></select></div>
-            <div class="input-group"><label>الحد الأدنى للمخزون</label><input type="number" id="newItemMin"></div>
+            <div class="input-group">
+                <label>اسم الصنف</label>
+                <input type="text" id="newItemName">
+            </div>
+            <div class="input-group">
+                <label>التصنيف</label>
+                <input type="text" id="newItemCategory">
+            </div>
+            <div class="input-group">
+                <label>الوحدة</label>
+                <select id="newItemUnit"><option>وحدة</option><option>علبة</option><option>قارورة</option><option>حقنة</option><option>قطعة</option></select>
+            </div>
+            <div class="input-group">
+                <label>الحد الأدنى للمخزون</label>
+                <input type="number" id="newItemMin">
+            </div>
             <button class="btn btn-blue" onclick="saveNewItem()">حفظ الصنف</button>
         </div>
+
         <div class="card">
             <h2>إضافة دفعة</h2>
-            <div class="input-group"><label>اختر الصنف</label><select id="batchItemSelect"></select></div>
-            <div class="input-group"><label>رقم الدفعة</label><input type="text" id="newBatchNumber"></div>
-            <div class="input-group"><label>الكمية المضافة</label><input type="number" id="newBatchQty"></div>
-            <div class="input-group"><label>تاريخ الانتهاء</label><input type="date" id="newBatchExp"></div>
-            <div class="input-group"><label>المورد</label><input type="text" id="newBatchSupplier"></div>
-            <div class="input-group"><label>موقع التخزين</label><input type="text" id="newBatchLocation"></div>
+            <div class="input-group">
+                <label>اختر الصنف</label>
+                <select id="batchItemSelect"></select>
+            </div>
+            <div class="input-group">
+                <label>رقم الدفعة</label>
+                <input type="text" id="newBatchNumber">
+            </div>
+            <div class="input-group">
+                <label>الكمية المضافة</label>
+                <input type="number" id="newBatchQty" oninput="calcTotalStock()">
+            </div>
+            <div class="input-group">
+                <label>تاريخ الانتهاء</label>
+                <input type="date" id="newBatchExp">
+            </div>
+            <div class="input-group">
+                <label>المورد</label>
+                <input type="text" id="newBatchSupplier">
+            </div>
+            <div class="input-group">
+                <label>موقع التخزين</label>
+                <input type="text" id="newBatchLocation">
+            </div>
             <button class="btn btn-green" onclick="saveBatch()">إضافة الدفعة</button>
         </div>
     </section>
 
+    <!-- Withdraw Section -->
     <section id="withdraw" class="hidden">
         <div class="card">
             <h2>صرف مخزون (FEFO)</h2>
-            <div class="input-group"><label>اختر الصنف</label><select id="withdrawItemSelect" onchange="showWithdrawBatches()"></select></div>
+            <div class="input-group">
+                <label>اختر الصنف</label>
+                <select id="withdrawItemSelect" onchange="showWithdrawBatches()"></select>
+            </div>
             <div id="batchWithdrawList"></div>
-            <div class="input-group"><label>الكمية المراد صرفها</label><input type="number" id="withdrawQty"></div>
-            <div class="input-group"><label>السبب</label><textarea id="withdrawReason"></textarea></div>
+            <div class="input-group">
+                <label>الكمية المراد صرفها</label>
+                <input type="number" id="withdrawQty">
+            </div>
+            <div class="input-group">
+                <label>السبب</label>
+                <textarea id="withdrawReason"></textarea>
+            </div>
             <button class="btn btn-red" onclick="performWithdraw()">تأكيد الصرف</button>
         </div>
     </section>
 
+    <!-- History Section -->
     <section id="history" class="hidden">
         <div class="card">
             <h2>سجل العمليات</h2>
@@ -150,6 +187,7 @@
         </div>
     </section>
 
+    <!-- Expiry Section -->
     <section id="expiry" class="hidden">
         <div class="card">
             <h2>إدارة الصلاحية</h2>
@@ -157,6 +195,7 @@
         </div>
     </section>
 
+    <!-- Reports Section -->
     <section id="reports" class="hidden">
         <div class="card">
             <h2>تقارير المخزون</h2>
@@ -165,11 +204,13 @@
     </section>
 </main>
 
+<!-- Floating Buttons -->
 <div class="floating-buttons">
     <button class="floating-btn btn-blue" onclick="showSection('add')">+</button>
     <button class="floating-btn btn-red" onclick="showSection('withdraw')">-</button>
 </div>
 
+<!-- Edit/Delete Modal -->
 <div id="editModal" class="modal hidden" onclick="closeEditModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <h3>تعديل / حذف الصنف</h3>
@@ -182,13 +223,9 @@
         <button class="btn btn-grey" onclick="closeEditModal()" style="margin-top: 10px;">إلغاء</button>
     </div>
 </div>
-</div>
 
 <script>
-    // كلمة المرور
-    const PASSWORD = "123456";
-
-    // بيانات التطبيق
+    // Initial Demo Data (Sample Data)
     let appData = {
         items: [
             { id: 1, name: 'Tc-99m Generator', category: 'Radioactive', unit: 'Kit', minStock: 5, active: true },
@@ -200,7 +237,7 @@
             { id: 1, itemId: 1, batchNumber: 'B001', qty: 10, originalQty: 10, expDate: '2026-12-10', supplier: 'PharmaCo', location: 'Fridge A', notes: '' },
             { id: 2, itemId: 2, batchNumber: 'B002', qty: 20, originalQty: 20, expDate: '2027-03-15', supplier: 'Medline', location: 'Shelf B', notes: '' },
             { id: 3, itemId: 3, batchNumber: 'B003', qty: 100, originalQty: 100, expDate: '2028-01-01', supplier: 'Local', location: 'Store 1', notes: '' },
-            { id: 4, itemId: 4, batchNumber: 'B004', qty: 5, originalQty: 5, expDate: '2026-09-30', supplier: 'PharmaCo', location: 'Hot Lab', notes: '' }
+            { id: 4, itemId: 4, batchNumber: 'B004', qty: 5, originalQty: 5, expDate: '2026-09-30', supplier: 'PharmaCo', location: 'Hot Lab', notes: 'Gamma' }
         ],
         transactions: [
             { id: 1, date: '2026-09-01', time: '10:00', user: 'admin', itemId: 1, batchId: 1, type: 'ADD', qty: 10, prevQty: 0, newQty: 10, reason: 'Initial Stock' },
@@ -208,28 +245,10 @@
         ]
     };
 
-    // دالة تسجيل الدخول
-    function checkPassword() {
-        var input = document.getElementById('passwordInput').value;
-        if (input === PASSWORD) {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appContent').classList.remove('hidden');
-            loadData();
-            updateDashboard();
-        } else {
-            document.getElementById('loginError').style.display = 'block';
-        }
-    }
+    let currentLang = 'ar';
+    let editItemId = null;
 
-    // دالة الخروج
-    function logout() {
-        document.getElementById('appContent').classList.add('hidden');
-        document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('passwordInput').value = '';
-        document.getElementById('loginError').style.display = 'none';
-    }
-
-    // تحميل البيانات
+    // Load Data from localStorage
     function loadData() {
         const saved = localStorage.getItem('medInventoryData');
         if (saved) {
@@ -239,17 +258,19 @@
         }
     }
 
-    // حفظ البيانات
+    // Save Data to localStorage
     function saveData() {
         localStorage.setItem('medInventoryData', JSON.stringify(appData));
     }
 
-    // بقية الدوال (نفس الكود السابق)
+    // UI Functions
     function showSection(sectionId) {
         document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
         document.getElementById(sectionId).classList.remove('hidden');
+        
         document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
         document.querySelector(`nav button[data-section="${sectionId}"]`).classList.add('active');
+        
         if (sectionId === 'dashboard') updateDashboard();
         if (sectionId === 'inventory') renderInventory();
         if (sectionId === 'add') renderAddForm();
@@ -265,17 +286,21 @@
         const exp30 = appData.batches.filter(b => { const d = new Date(b.expDate); return d > now && d < new Date(now.getTime() + 30*24*60*60*1000); }).length;
         const exp90 = appData.batches.filter(b => { const d = new Date(b.expDate); return d > now && d < new Date(now.getTime() + 90*24*60*60*1000); }).length;
         const expired = appData.batches.filter(b => new Date(b.expDate) < now).length;
+        
         let lowStockCount = 0;
         appData.items.forEach(item => {
             const totalQtyItem = appData.batches.filter(b => b.itemId === item.id).reduce((sum, b) => sum + b.qty, 0);
             if (totalQtyItem < item.minStock) lowStockCount++;
         });
+
         document.getElementById('statItems').textContent = totalItems;
         document.getElementById('statQty').textContent = totalQty;
         document.getElementById('statExp30').textContent = exp30;
         document.getElementById('statExp90').textContent = exp90;
         document.getElementById('statExpired').textContent = expired;
         document.getElementById('statLow').textContent = lowStockCount;
+
+        // Recent Transactions
         const recentList = document.getElementById('recentTransactions');
         recentList.innerHTML = appData.transactions.slice(-5).reverse().map(t => {
             const item = appData.items.find(i => i.id === t.itemId);
@@ -289,7 +314,8 @@
             const itemBatches = appData.batches.filter(b => b.itemId === item.id);
             const totalQty = itemBatches.reduce((sum, b) => sum + b.qty, 0);
             const lowStock = totalQty < item.minStock;
-            return `<div class="list-item">
+            return `
+            <div class="list-item">
                 <h3>${item.name} <span class="status-badge ${lowStock ? 'status-low' : 'status-normal'}">${lowStock ? 'LOW STOCK' : 'OK'}</span></h3>
                 <p>${item.category} - ${item.unit}</p>
                 <p>إجمالي الكمية: ${totalQty} | الحد الأدنى: ${item.minStock}</p>
@@ -323,8 +349,12 @@
         const category = document.getElementById('newItemCategory').value;
         const unit = document.getElementById('newItemUnit').value;
         const min = document.getElementById('newItemMin').value;
+        
         if (!name || !category || !unit || !min) { alert('يرجى تعبئة جميع الحقول'); return; }
-        appData.items.push({ id: Date.now(), name, category, unit, minStock: Number(min), active: true });
+        
+        appData.items.push({
+            id: Date.now(), name, category, unit, minStock: Number(min), active: true
+        });
         saveData();
         alert('تم حفظ الصنف بنجاح');
         renderAddForm();
@@ -338,10 +368,19 @@
         const expDate = document.getElementById('newBatchExp').value;
         const supplier = document.getElementById('newBatchSupplier').value;
         const location = document.getElementById('newBatchLocation').value;
+        
         if (!batchNumber || !qty || !expDate) { alert('يرجى تعبئة الحقول الأساسية'); return; }
-        const batch = { id: Date.now(), itemId, batchNumber, qty, originalQty: qty, expDate, supplier, location, notes: '' };
+        
+        const batch = {
+            id: Date.now(), itemId, batchNumber, qty, originalQty: qty, expDate, supplier, location, notes: ''
+        };
+        
         appData.batches.push(batch);
-        appData.transactions.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0], user: 'admin', itemId, batchId: batch.id, type: 'ADD', qty, prevQty: 0, newQty: qty, reason: 'New Batch Added' });
+        appData.transactions.push({
+            id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0],
+            user: 'admin', itemId, batchId: batch.id, type: 'ADD', qty, prevQty: 0, newQty: qty, reason: 'New Batch Added'
+        });
+        
         saveData();
         alert('تم إضافة الدفعة بنجاح');
         renderAddForm();
@@ -356,6 +395,7 @@
     function showWithdrawBatches() {
         const itemId = Number(document.getElementById('withdrawItemSelect').value);
         const batches = appData.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a, b) => new Date(a.expDate) - new Date(b.expDate));
+        
         document.getElementById('batchWithdrawList').innerHTML = batches.map(b => 
             `<div class="list-item" style="border:1px solid #eee; padding:10px; margin-bottom:5px;">
                 <strong>دفعة: ${b.batchNumber}</strong> | الكمية: ${b.qty} | انتهاء: ${b.expDate}
@@ -367,18 +407,27 @@
         const itemId = Number(document.getElementById('withdrawItemSelect').value);
         const qtyToWithdraw = Number(document.getElementById('withdrawQty').value);
         const reason = document.getElementById('withdrawReason').value;
+        
         if (!qtyToWithdraw || qtyToWithdraw <= 0) { alert('يرجى إدخال كمية صحيحة'); return; }
         if (!confirm(`تأكيد صرف ${qtyToWithdraw} وحدة؟`)) return;
+        
+        // FEFO logic: allocate from earliest expiry first
         let remaining = qtyToWithdraw;
         const batchesToUpdate = appData.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a, b) => new Date(a.expDate) - new Date(b.expDate));
+        
         for (const batch of batchesToUpdate) {
             if (remaining <= 0) break;
             const usedQty = Math.min(remaining, batch.qty);
             batch.qty -= usedQty;
             remaining -= usedQty;
-            appData.transactions.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0], user: 'admin', itemId, batchId: batch.id, type: 'WITHDRAW', qty: usedQty, prevQty: batch.qty + usedQty, newQty: batch.qty, reason });
+            appData.transactions.push({
+                id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0],
+                user: 'admin', itemId, batchId: batch.id, type: 'WITHDRAW', qty: usedQty, prevQty: batch.qty + usedQty, newQty: batch.qty, reason
+            });
         }
+        
         if (remaining > 0) { alert('الكمية المطلوبة غير متوفرة'); }
+        
         saveData();
         renderWithdrawForm();
         showSection('withdraw');
@@ -406,6 +455,7 @@
         }).join('');
     }
 
+    // Edit / Delete Item Functions
     function editItem(itemId) {
         editItemId = itemId;
         const item = appData.items.find(i => i.id === itemId);
@@ -432,8 +482,12 @@
     function deleteItem() {
         if (!editItemId) return;
         if (!confirm('هل أنت متأكد من حذف الصنف نهائياً؟')) return;
+        
+        // Delete related batches
         appData.batches = appData.batches.filter(b => b.itemId !== editItemId);
+        // Delete or deactivate item
         appData.items = appData.items.filter(i => i.id !== editItemId);
+        
         saveData();
         closeEditModal();
         renderInventory();
@@ -445,6 +499,7 @@
         document.getElementById('editModal').classList.add('hidden');
     }
 
+    // Export CSV
     function exportCSV() {
         let csv = "Item,Batch,Qty,Expiry\n";
         appData.batches.forEach(b => {
@@ -459,7 +514,28 @@
         a.click();
     }
 
-    let editItemId = null;
+    // Language Switching
+    document.getElementById('langSwitch').addEventListener('click', function() {
+        if (currentLang === 'ar') {
+            currentLang = 'en';
+            document.documentElement.dir = 'ltr';
+            document.getElementById('appTitle').textContent = 'Medical Inventory System';
+            this.textContent = 'عربي';
+        } else {
+            currentLang = 'ar';
+            document.documentElement.dir = 'rtl';
+            document.getElementById('appTitle').textContent = 'نظام إدارة المخزون الطبي';
+            this.textContent = 'English';
+        }
+    });
+
+    // Initialization
+    loadData();
+    updateDashboard();
+
+    function calcTotalStock() {
+        // Just a placeholder for future functionality
+    }
 </script>
 
 </body>
