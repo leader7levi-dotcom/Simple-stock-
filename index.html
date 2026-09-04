@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المخزون</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        
+        /* الألوان الجديدة: أزرق سماوي وأبيض */
+        body { background-color: #FFFFFF; color: #333; }
+        
+        /* شاشة تسجيل الدخول */
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00BFFF; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: #FFFFFF; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .login-box h1 { color: #00BFFF; margin-bottom: 20px; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #00BFFF; border-radius: 8px; font-size: 18px; text-align: center; background: #F0F8FF; color: #333; }
+        .login-box button { width: 100%; padding: 12px; background: #00BFFF; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; font-weight: bold; }
+        .login-error { color: red; margin-top: 10px; font-size: 14px; display: none; }
+        
+        /* بقية التطبيق */
+        .hidden { display: none; }
+        header { background-color: #00BFFF; color: white; padding: 15px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,191,255,0.3); }
+        h1 { font-size: 22px; }
+        nav { display: flex; overflow-x: auto; background-color: #F0F8FF; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #00BFFF; }
+        nav button { flex: 1; padding: 12px 5px; background: none; border: none; color: #00BFFF; font-size: 14px; cursor: pointer; min-width: 80px; font-weight: bold; }
+        nav button.active { background-color: #00BFFF; color: white; }
+        
+        main { padding: 15px; margin-bottom: 60px; background: #FFFFFF; }
+        .card { background: #F0F8FF; border: 1px solid #87CEEB; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,191,255,0.1); }
+        .card h2 { font-size: 18px; margin-bottom: 10px; color: #00BFFF; }
+        .input-group { margin-bottom: 10px; }
+        .input-group label { display: block; font-size: 14px; margin-bottom: 5px; color: #333; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 2px solid #00BFFF; border-radius: 8px; font-size: 16px; background: white; }
+        
+        .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 5px; display: block; width: 100%; text-align: center; font-weight: bold; }
+        .btn-green { background-color: #00BFFF; color: white; }
+        .btn-blue { background-color: #0080FF; color: white; }
+        .btn-red { background-color: #FF4D4D; color: white; }
+        .btn-grey { background-color: #E0E0E0; color: black; }
+        .btn-small { display: inline-block; width: auto; padding: 8px 15px; font-size: 12px; margin-top: 5px; }
+        
+        .dashboard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-card { background: #F0F8FF; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 5px solid #00BFFF; }
+        .stat-card.yellow { border-top-color: #FFC107; }
+        .stat-card.red { border-top-color: #FF4D4D; }
+        .stat-card h3 { font-size: 14px; color: #333; }
+        .stat-card p { font-size: 24px; font-weight: bold; color: #00BFFF; }
+        
+        .list-item { border-bottom: 1px solid #87CEEB; padding: 10px 0; }
+        .list-item:last-child { border-bottom: none; }
+        .floating-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+        .floating-btn { width: 60px; height: 60px; border-radius: 50%; border: none; color: white; font-size: 30px; box-shadow: 0 4px 10px rgba(0,191,255,0.4); }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; border: 2px solid #00BFFF; }
+        .modal-content h3 { margin-bottom: 15px; color: #00BFFF; }
+        .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; color: white; }
+        .status-normal { background-color: #00BFFF; }
+        .status-expired { background-color: #FF4D4D; }
+        .status-low { background-color: #FFC107; }
+        .action-row { display: flex; gap: 10px; margin-top: 10px; }
+        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.3); border: none; color: white; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* ألوان النص والأزرار العامة */
+        button { font-family: inherit; }
+        input, select, textarea { outline: none; }
+    </style>
+</head>
+<body>
+
+<!-- شاشة تسجيل الدخول الجديدة -->
+<div id="loginScreen">
+    <div class="login-box">
+        <h1>تسجيل الدخول</h1>
+        <input type="text" id="usernameInput" placeholder="اسم المستخدم">
+        <input type="password" id="passwordInput" placeholder="كلمة المرور">
+        <button onclick="checkLogin()">دخول</button>
+        <div class="login-error" id="loginError">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+    </div>
+</div>
+
+<!-- محتوى التطبيق (مخفي حتى تسجيل الدخول) -->
+<div id="appContent" class="hidden">
+<header>
+    <button class="logout-btn" onclick="logout()">خروج</button>
+    <h1>نظام إدارة المخزون الطبي</h1>
+</header>
+
+<nav>
+    <button class="active" onclick="showSection('dashboard')" data-section="dashboard">الرئيسية</button>
+    <button onclick="showSection('inventory')" data-section="inventory">المخزون</button>
+    <button onclick="showSection('add')" data-section="add">إضافة</button>
+    <button onclick="showSection('withdraw')" data-section="withdraw">صرف</button>
+    <button onclick="showSection('history')" data-section="history">السجل</button>
+    <button onclick="showSection('expiry')" data-section="expiry">الصلاحية</button>
+    <button onclick="showSection('reports')" data-section="reports">التقارير</button>
+</nav>
+
+<main>
+    <section id="dashboard">
+        <div class="dashboard-stats">
+            <div class="stat-card"><h3>عدد الأصناف</h3><p id="statItems">0</p></div>
+            <div class="stat-card"><h3>إجمالي الكمية</h3><p id="statQty">0</p></div>
+            <div class="stat-card yellow"><h3>تنتهي خلال 30 يوم</h3><p id="statExp30">0</p></div>
+            <div class="stat-card yellow"><h3>تنتهي خلال 90 يوم</h3><p id="statExp90">0</p></div>
+            <div class="stat-card red"><h3>منتهي الصلاحية</h3><p id="statExpired">0</p></div>
+            <div class="stat-card red"><h3>نقص المخزون</h3><p id="statLow">0</p></div>
+        </div>
+        <div class="card" style="margin-top: 15px;">
+            <h2>أحدث العمليات</h2>
+            <div id="recentTransactions"></div>
+        </div>
+    </section>
+
+    <section id="inventory" class="hidden">
+        <div class="card">
+            <input type="text" id="searchInput" placeholder="بحث بالاسم، رقم الدفعة، التصنيف..." oninput="searchItems()" style="margin-bottom: 10px;">
+            <h2>الأصناف والدفعات</h2>
+            <div id="inventoryList"></div>
+        </div>
+    </section>
+
+    <section id="add" class="hidden">
+        <div class="card">
+            <h2>إضافة مخزون جديد</h2>
+            <div class="input-group"><label>اسم الصنف</label><input type="text" id="newItemName"></div>
+            <div class="input-group"><label>التصنيف</label><input type="text" id="newItemCategory"></div>
+            <div class="input-group"><label>الوحدة</label><select id="newItemUnit"><option>وحدة</option><option>علبة</option><option>قارورة</option><option>حقنة</option><option>قطعة</option></select></div>
+            <div class="input-group"><label>الحد الأدنى للمخزون</label><input type="number" id="newItemMin"></div>
+            <button class="btn btn-blue" onclick="saveNewItem()">حفظ الصنف</button>
+        </div>
+        <div class="card">
+            <h2>إضافة دفعة</h2>
+            <div class="input-group"><label>اختر الصنف</label><select id="batchItemSelect"></select></div>
+            <div class="input-group"><label>رقم الدفعة</label><input type="text" id="newBatchNumber"></div>
+            <div class="input-group"><label>الكمية المضافة</label><input type="number" id="newBatchQty"></div>
+            <div class="input-group"><label>تاريخ الانتهاء</label><input type="date" id="newBatchExp"></div>
+            <div class="input-group"><label>المورد</label><input type="text" id="newBatchSupplier"></div>
+            <div class="input-group"><label>موقع التخزين</label><input type="text" id="newBatchLocation"></div>
+            <button class="btn btn-green" onclick="saveBatch()">إضافة الدفعة</button>
+        </div>
+    </section>
+
+    <section id="withdraw" class="hidden">
+        <div class="card">
+            <h2>صرف مخزون (FEFO)</h2>
+            <div class="input-group"><label>اختر الصنف</label><select id="withdrawItemSelect" onchange="showWithdrawBatches()"></select></div>
+            <div id="batchWithdrawList"></div>
+            <div class="input-group"><label>الكمية المراد صرفها</label><input type="number" id="withdrawQty"></div>
+            <div class="input-group"><label>السبب</label><textarea id="withdrawReason"></textarea></div>
+            <button class="btn btn-red" onclick="performWithdraw()">تأكيد الصرف</button>
+        </div>
+    </section>
+
+    <section id="history" class="hidden">
+        <div class="card">
+            <h2>سجل العمليات</h2>
+            <div id="transactionHistoryList"></div>
+        </div>
+    </section>
+
+    <section id="expiry" class="hidden">
+        <div class="card">
+            <h2>إدارة الصلاحية</h2>
+            <div id="expiryList"></div>
+        </div>
+    </section>
+
+    <section id="reports" class="hidden">
+        <div class="card">
+            <h2>تقارير المخزون</h2>
+            <button class="btn btn-blue" onclick="exportCSV()">تصدير بيانات CSV</button>
+        </div>
+    </section>
+</main>
+
+<div class="floating-buttons">
+    <button class="floating-btn btn-blue" onclick="showSection('add')">+</button>
+    <button class="floating-btn btn-red" onclick="showSection('withdraw')">-</button>
+</div>
+
+<div id="editModal" class="modal hidden" onclick="closeEditModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3>تعديل / حذف الصنف</h3>
+        <div class="input-group"><label>اسم الصنف</label><input type="text" id="editItemName"></div>
+        <div class="input-group"><label>التصنيف</label><input type="text" id="editItemCategory"></div>
+        <div class="input-group"><label>الوحدة</label><input type="text" id="editItemUnit"></div>
+        <div class="input-group"><label>الحد الأدنى</label><input type="number" id="editItemMin"></div>
+        <button class="btn btn-blue" onclick="updateItem()">حفظ التعديلات</button>
+        <button class="btn btn-red" onclick="deleteItem()" style="margin-top: 10px;">حذف الصنف نهائياً</button>
+        <button class="btn btn-grey" onclick="closeEditModal()" style="margin-top: 10px;">إلغاء</button>
+    </div>
+</div>
+</div>
+
+<script>
+    // اسم المستخدم وكلمة المرور
+    const VALID_USERNAME = "admin";
+    const VALID_PASSWORD = "1234";
+
+    // بيانات التطبيق
+    let appData = {
+        items: [
+            { id: 1, name: 'Tc-99m Generator', category: 'Radioactive', unit: 'Kit', minStock: 5, active: true },
+            { id: 2, name: 'FDG Dose', category: 'Radiopharma', unit: 'Vial', minStock: 10, active: true },
+            { id: 3, name: 'Syringe 5ml', category: 'Consumables', unit: 'Piece', minStock: 50, active: true }
+        ],
+        batches: [
+            { id: 1, itemId: 1, batchNumber: 'B001', qty: 10, originalQty: 10, expDate: '2026-12-10', supplier: 'PharmaCo', location: 'Fridge A', notes: '' },
+            { id: 2, itemId: 2, batchNumber: 'B002', qty: 20, originalQty: 20, expDate: '2027-03-15', supplier: 'Medline', location: 'Shelf B', notes: '' },
+            { id: 3, itemId: 3, batchNumber: 'B003', qty: 100, originalQty: 100, expDate: '2028-01-01', supplier: 'Local', location: 'Store 1', notes: '' }
+        ],
+        transactions: [
+            { id: 1, date: '2026-09-01', time: '10:00', user: 'admin', itemId: 1, batchId: 1, type: 'ADD', qty: 10, prevQty: 0, newQty: 10, reason: 'Initial Stock' },
+            { id: 2, date: '2026-09-02', time: '11:30', user: 'admin', itemId: 2, batchId: 2, type: 'ADD', qty: 20, prevQty: 0, newQty: 20, reason: 'Delivery' }
+        ]
+    };
+
+    let editItemId = null;
+
+    // دالة تسجيل الدخول الجديدة
+    function checkLogin() {
+        var user = document.getElementById('usernameInput').value;
+        var pass = document.getElementById('passwordInput').value;
+        
+        if (user === VALID_USERNAME && pass === VALID_PASSWORD) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContent').classList.remove('hidden');
+            loadData();
+            updateDashboard();
+        } else {
+            document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    // دالة الخروج
+    function logout() {
+        document.getElementById('appContent').classList.add('hidden');
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('usernameInput').value = '';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('loginError').style.display = 'none';
+    }
+
+    // تحميل البيانات
+    function loadData() {
+        const saved = localStorage.getItem('medInventoryData');
+        if (saved) {
+            appData = JSON.parse(saved);
+        } else {
+            saveData();
+        }
+    }
+
+    // حفظ البيانات
+    function saveData() {
+        localStorage.setItem('medInventoryData', JSON.stringify(appData));
+    }
+
+    // بقية الدوال (نفس الوظائف السابقة)
+    function showSection(sectionId) {
+        document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
+        document.getElementById(sectionId).classList.remove('hidden');
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`nav button[data-section="${sectionId}"]`).classList.add('active');
+        if (sectionId === 'dashboard') updateDashboard();
+        if (sectionId === 'inventory') renderInventory();
+        if (sectionId === 'add') renderAddForm();
+        if (sectionId === 'withdraw') renderWithdrawForm();
+        if (sectionId === 'history') renderHistory();
+        if (sectionId === 'expiry') renderExpiry();
+    }
+
+    function updateDashboard() {
+        const totalItems = appData.items.filter(i => i.active).length;
+        const totalQty = appData.batches.reduce((sum, b) => sum + b.qty, 0);
+        const now = new Date();
+        const exp30 = appData.batches.filter(b => { const d = new Date(b.expDate); return d > now && d < new Date(now.getTime() + 30*24*60*60*1000); }).length;
+        const exp90 = appData.batches.filter(b => { const d = new Date(b.expDate); return d > now && d < new Date(now.getTime() + 90*24*60*60*1000); }).length;
+        const expired = appData.batches.filter(b => new Date(b.expDate) < now).length;
+        
+        let lowStockCount = 0;
+        appData.items.forEach(item => {
+            const totalQtyItem = appData.batches.filter(b => b.itemId === item.id).reduce((sum, b) => sum + b.qty, 0);
+            if (totalQtyItem < item.minStock) lowStockCount++;
+        });
+
+        document.getElementById('statItems').textContent = totalItems;
+        document.getElementById('statQty').textContent = totalQty;
+        document.getElementById('statExp30').textContent = exp30;
+        document.getElementById('statExp90').textContent = exp90;
+        document.getElementById('statExpired').textContent = expired;
+        document.getElementById('statLow').textContent = lowStockCount;
+
+        const recentList = document.getElementById('recentTransactions');
+        recentList.innerHTML = appData.transactions.slice(-5).reverse().map(t => {
+            const item = appData.items.find(i => i.id === t.itemId);
+            return `<div class="list-item">${t.type} - ${item ? item.name : 'Unknown'} - ${t.qty}</div>`;
+        }).join('');
+    }
+
+    function renderInventory() {
+        const list = document.getElementById('inventoryList');
+        list.innerHTML = appData.items.filter(i => i.active).map(item => {
+            const itemBatches = appData.batches.filter(b => b.itemId === item.id);
+            const totalQty = itemBatches.reduce((sum, b) => sum + b.qty, 0);
+            const lowStock = totalQty < item.minStock;
+            return `<div class="list-item">
+                <h3>${item.name} <span class="status-badge ${lowStock ? 'status-low' : 'status-normal'}">${lowStock ? 'LOW STOCK' : 'OK'}</span></h3>
+                <p>${item.category} - ${item.unit}</p>
+                <p>إجمالي الكمية: ${totalQty} | الحد الأدنى: ${item.minStock}</p>
+                <div class="action-row">
+                    <button class="btn btn-small btn-grey" onclick="editItem(${item.id})">تعديل/حذف</button>
+                </div>
+                <div style="margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+                    ${itemBatches.map(b => `<div style="font-size:13px; margin-bottom:5px;">دفعة ${b.batchNumber}: ${b.qty} (EXP: ${b.expDate})</div>`).join('')}
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function searchItems() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const list = document.getElementById('inventoryList');
+        list.innerHTML = appData.items.filter(i => i.active && (i.name.toLowerCase().includes(search) || i.category.toLowerCase().includes(search))).map(item => {
+            const itemBatches = appData.batches.filter(b => b.itemId === item.id);
+            const totalQty = itemBatches.reduce((sum, b) => sum + b.qty, 0);
+            return `<div class="list-item"><h3>${item.name}</h3><p>إجمالي الكمية: ${totalQty}</p></div>`;
+        }).join('');
+    }
+
+    function renderAddForm() {
+        const select = document.getElementById('batchItemSelect');
+        select.innerHTML = appData.items.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+    }
+
+    function saveNewItem() {
+        const name = document.getElementById('newItemName').value;
+        const category = document.getElementById('newItemCategory').value;
+        const unit = document.getElementById('newItemUnit').value;
+        const min = document.getElementById('newItemMin').value;
+        if (!name || !category || !unit || !min) { alert('يرجى تعبئة جميع الحقول'); return; }
+        appData.items.push({ id: Date.now(), name, category, unit, minStock: Number(min), active: true });
+        saveData();
+        alert('تم حفظ الصنف بنجاح');
+        renderAddForm();
+        renderInventory();
+    }
+
+    function saveBatch() {
+        const itemId = Number(document.getElementById('batchItemSelect').value);
+        const batchNumber = document.getElementById('newBatchNumber').value;
+        const qty = Number(document.getElementById('newBatchQty').value);
+        const expDate = document.getElementById('newBatchExp').value;
+        const supplier = document.getElementById('newBatchSupplier').value;
+        const location = document.getElementById('newBatchLocation').value;
+        if (!batchNumber || !qty || !expDate) { alert('يرجى تعبئة الحقول الأساسية'); return; }
+        const batch = { id: Date.now(), itemId, batchNumber, qty, originalQty: qty, expDate, supplier, location, notes: '' };
+        appData.batches.push(batch);
+        appData.transactions.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0], user: 'admin', itemId, batchId: batch.id, type: 'ADD', qty, prevQty: 0, newQty: qty, reason: 'New Batch Added' });
+        saveData();
+        alert('تم إضافة الدفعة بنجاح');
+        renderAddForm();
+    }
+
+    function renderWithdrawForm() {
+        const select = document.getElementById('withdrawItemSelect');
+        select.innerHTML = appData.items.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+        showWithdrawBatches();
+    }
+
+    function showWithdrawBatches() {
+        const itemId = Number(document.getElementById('withdrawItemSelect').value);
+        const batches = appData.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a, b) => new Date(a.expDate) - new Date(b.expDate));
+        document.getElementById('batchWithdrawList').innerHTML = batches.map(b => 
+            `<div class="list-item" style="border:1px solid #00BFFF; padding:10px; margin-bottom:5px;">
+                <strong>دفعة: ${b.batchNumber}</strong> | الكمية: ${b.qty} | انتهاء: ${b.expDate}
+            </div>`
+        ).join('');
+    }
+
+    function performWithdraw() {
+        const itemId = Number(document.getElementById('withdrawItemSelect').value);
+        const qtyToWithdraw = Number(document.getElementById('withdrawQty').value);
+        const reason = document.getElementById('withdrawReason').value;
+        if (!qtyToWithdraw || qtyToWithdraw <= 0) { alert('يرجى إدخال كمية صحيحة'); return; }
+        if (!confirm(`تأكيد صرف ${qtyToWithdraw} وحدة؟`)) return;
+        
+        let remaining = qtyToWithdraw;
+        const batchesToUpdate = appData.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a, b) => new Date(a.expDate) - new Date(b.expDate));
+        
+        for (const batch of batchesToUpdate) {
+            if (remaining <= 0) break;
+            const usedQty = Math.min(remaining, batch.qty);
+            batch.qty -= usedQty;
+            remaining -= usedQty;
+            appData.transactions.push({
+                id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0],
+                user: 'admin', itemId, batchId: batch.id, type: 'WITHDRAW', qty: usedQty, prevQty: batch.qty + usedQty, newQty: batch.qty, reason
+            });
+        }
+        
+        if (remaining > 0) { alert('الكمية المطلوبة غير متوفرة'); }
+        
+        saveData();
+        renderWithdrawForm();
+        showSection('withdraw');
+        alert('تم الصرف بنجاح');
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('transactionHistoryList');
+        list.innerHTML = appData.transactions.reverse().map(t => {
+            const item = appData.items.find(i => i.id === t.itemId);
+            return `<div class="list-item">${t.date} - ${item ? item.name : ''} - ${t.type} - ${t.qty} (السبب: ${t.reason})</div>`;
+        }).join('');
+    }
+
+    function renderExpiry() {
+        const now = new Date();
+        const list = document.getElementById('expiryList');
+        list.innerHTML = appData.batches.filter(b => new Date(b.expDate) < new Date(now.getTime() + 90*24*60*60*1000)).map(b => {
+            const item = appData.items.find(i => i.id === b.itemId);
+            const expired = new Date(b.expDate) < now;
+            const expSoon30 = new Date(b.expDate) < new Date(now.getTime() + 30*24*60*60*1000);
+            const status = expired ? 'status-expired' : (expSoon30 ? 'status-low' : 'status-normal');
+            const statusText = expired ? 'EXPIRED' : (expSoon30 ? 'EXP SOON' : 'OK');
+            return `<div class="list-item">${item.name} - Batch ${b.batchNumber} - EXP: ${b.expDate} - <span class="status-badge ${status}">${statusText}</span></div>`;
+        }).join('');
+    }
+
+    function editItem(itemId) {
+        editItemId = itemId;
+        const item = appData.items.find(i => i.id === itemId);
+        document.getElementById('editItemName').value = item.name;
+        document.getElementById('editItemCategory').value = item.category;
+        document.getElementById('editItemUnit').value = item.unit;
+        document.getElementById('editItemMin').value = item.minStock;
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+
+    function updateItem() {
+        if (!editItemId) return;
+        const item = appData.items.find(i => i.id === editItemId);
+        item.name = document.getElementById('editItemName').value;
+        item.category = document.getElementById('editItemCategory').value;
+        item.unit = document.getElementById('editItemUnit').value;
+        item.minStock = Number(document.getElementById('editItemMin').value);
+        saveData();
+        closeEditModal();
+        renderInventory();
+        alert('تم تحديث الصنف');
+    }
+
+    function deleteItem() {
+        if (!editItemId) return;
+        if (!confirm('هل أنت متأكد من حذف الصنف نهائياً؟')) return;
+        
+        appData.batches = appData.batches.filter(b => b.itemId !== editItemId);
+        appData.items = appData.items.filter(i => i.id !== editItemId);
+        
+        saveData();
+        closeEditModal();
+        renderInventory();
+        updateDashboard();
+        alert('تم حذف الصنف');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+    }
+
+    function exportCSV() {
+        let csv = "Item,Batch,Qty,Expiry\n";
+        appData.batches.forEach(b => {
+            const item = appData.items.find(i => i.id === b.itemId);
+            csv += `${item.name},${b.batchNumber},${b.qty},${b.expDate}\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'inventory_report.csv';
+        a.click();
+    }
+</script>
+
+</body>
+</html>
