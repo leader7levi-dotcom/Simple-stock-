@@ -3,79 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة المخزون</title>
+    <title>نظام إدارة المخزون الطبي</title>
     <style>
         * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        
-        /* الألوان الجديدة: أزرق سماوي وأبيض */
-        body { background-color: #FFFFFF; color: #333; }
+        body { background-color: #f4f7f6; color: #333; }
         
         /* شاشة تسجيل الدخول */
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #00BFFF; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-box { background: #FFFFFF; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .login-box h1 { color: #00BFFF; margin-bottom: 20px; }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #00BFFF; border-radius: 8px; font-size: 18px; text-align: center; background: #F0F8FF; color: #333; }
-        .login-box button { width: 100%; padding: 12px; background: #00BFFF; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; font-weight: bold; }
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #004d40; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: white; padding: 30px; border-radius: 10px; text-align: center; width: 90%; max-width: 350px; }
+        .login-box h1 { color: #004d40; margin-bottom: 20px; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 18px; text-align: center; }
+        .login-box button { width: 100%; padding: 12px; background: #004d40; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; }
         .login-error { color: red; margin-top: 10px; font-size: 14px; display: none; }
         
         /* بقية التطبيق */
         .hidden { display: none; }
-        header { background-color: #00BFFF; color: white; padding: 15px; text-align: center; position: relative; box-shadow: 0 4px 6px rgba(0,191,255,0.3); }
+        header { background-color: #004d40; color: white; padding: 15px; text-align: center; position: relative; }
         h1 { font-size: 22px; }
-        nav { display: flex; overflow-x: auto; background-color: #F0F8FF; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #00BFFF; }
-        nav button { flex: 1; padding: 12px 5px; background: none; border: none; color: #00BFFF; font-size: 14px; cursor: pointer; min-width: 80px; font-weight: bold; }
-        nav button.active { background-color: #00BFFF; color: white; }
-        
-        main { padding: 15px; margin-bottom: 60px; background: #FFFFFF; }
-        .card { background: #F0F8FF; border: 1px solid #87CEEB; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,191,255,0.1); }
-        .card h2 { font-size: 18px; margin-bottom: 10px; color: #00BFFF; }
+        nav { display: flex; overflow-x: auto; background-color: #00695c; position: sticky; top: 0; z-index: 100; }
+        nav button { flex: 1; padding: 12px 5px; background: none; border: none; color: white; font-size: 14px; cursor: pointer; min-width: 80px; }
+        nav button.active { background-color: #004d40; border-bottom: 3px solid #ffd54f; }
+        main { padding: 15px; margin-bottom: 60px; }
+        .card { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .card h2 { font-size: 18px; margin-bottom: 10px; color: #00695c; }
         .input-group { margin-bottom: 10px; }
-        .input-group label { display: block; font-size: 14px; margin-bottom: 5px; color: #333; }
-        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 2px solid #00BFFF; border-radius: 8px; font-size: 16px; background: white; }
-        
-        .btn { padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 5px; display: block; width: 100%; text-align: center; font-weight: bold; }
-        .btn-green { background-color: #00BFFF; color: white; }
-        .btn-blue { background-color: #0080FF; color: white; }
-        .btn-red { background-color: #FF4D4D; color: white; }
-        .btn-grey { background-color: #E0E0E0; color: black; }
+        .input-group label { display: block; font-size: 14px; margin-bottom: 5px; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        .btn { padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 5px; display: block; width: 100%; text-align: center; }
+        .btn-green { background-color: #2e7d32; color: white; }
+        .btn-blue { background-color: #1565c0; color: white; }
+        .btn-red { background-color: #c62828; color: white; }
+        .btn-grey { background-color: #e0e0e0; color: black; }
         .btn-small { display: inline-block; width: auto; padding: 8px 15px; font-size: 12px; margin-top: 5px; }
-        
         .dashboard-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-card { background: #F0F8FF; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 5px solid #00BFFF; }
-        .stat-card.yellow { border-top-color: #FFC107; }
-        .stat-card.red { border-top-color: #FF4D4D; }
-        .stat-card h3 { font-size: 14px; color: #333; }
-        .stat-card p { font-size: 24px; font-weight: bold; color: #00BFFF; }
-        
-        .list-item { border-bottom: 1px solid #87CEEB; padding: 10px 0; }
+        .stat-card { background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-top: 4px solid #ccc; }
+        .stat-card.green { border-top-color: #2e7d32; }
+        .stat-card.yellow { border-top-color: #ffb300; }
+        .stat-card.red { border-top-color: #c62828; }
+        .stat-card.blue { border-top-color: #1565c0; }
+        .stat-card h3 { font-size: 14px; }
+        .stat-card p { font-size: 24px; font-weight: bold; }
+        .list-item { border-bottom: 1px solid #eee; padding: 10px 0; }
         .list-item:last-child { border-bottom: none; }
         .floating-buttons { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
-        .floating-btn { width: 60px; height: 60px; border-radius: 50%; border: none; color: white; font-size: 30px; box-shadow: 0 4px 10px rgba(0,191,255,0.4); }
+        .floating-btn { width: 60px; height: 60px; border-radius: 50%; border: none; color: white; font-size: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { background: white; padding: 20px; border-radius: 15px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; border: 2px solid #00BFFF; }
-        .modal-content h3 { margin-bottom: 15px; color: #00BFFF; }
+        .modal-content { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+        .modal-content h3 { margin-bottom: 15px; }
         .status-badge { padding: 3px 8px; border-radius: 4px; font-size: 12px; color: white; }
-        .status-normal { background-color: #00BFFF; }
-        .status-expired { background-color: #FF4D4D; }
-        .status-low { background-color: #FFC107; }
+        .status-normal { background-color: #2e7d32; }
+        .status-expired { background-color: #c62828; }
+        .status-low { background-color: #ef6c00; }
         .action-row { display: flex; gap: 10px; margin-top: 10px; }
-        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.3); border: none; color: white; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        
-        /* ألوان النص والأزرار العامة */
-        button { font-family: inherit; }
-        input, select, textarea { outline: none; }
+        .logout-btn { position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<!-- شاشة تسجيل الدخول الجديدة -->
+<!-- شاشة تسجيل الدخول -->
 <div id="loginScreen">
     <div class="login-box">
-        <h1>تسجيل الدخول</h1>
-        <input type="text" id="usernameInput" placeholder="اسم المستخدم">
-        <input type="password" id="passwordInput" placeholder="كلمة المرور">
-        <button onclick="checkLogin()">دخول</button>
-        <div class="login-error" id="loginError">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+        <h1>نظام المخزون</h1>
+        <input type="password" id="passwordInput" placeholder="أدخل كلمة المرور">
+        <button onclick="checkPassword()">دخول</button>
+        <div class="login-error" id="loginError">كلمة المرور غير صحيحة</div>
     </div>
 </div>
 
@@ -99,8 +90,8 @@
 <main>
     <section id="dashboard">
         <div class="dashboard-stats">
-            <div class="stat-card"><h3>عدد الأصناف</h3><p id="statItems">0</p></div>
-            <div class="stat-card"><h3>إجمالي الكمية</h3><p id="statQty">0</p></div>
+            <div class="stat-card blue"><h3>عدد الأصناف</h3><p id="statItems">0</p></div>
+            <div class="stat-card green"><h3>إجمالي الكمية</h3><p id="statQty">0</p></div>
             <div class="stat-card yellow"><h3>تنتهي خلال 30 يوم</h3><p id="statExp30">0</p></div>
             <div class="stat-card yellow"><h3>تنتهي خلال 90 يوم</h3><p id="statExp90">0</p></div>
             <div class="stat-card red"><h3>منتهي الصلاحية</h3><p id="statExpired">0</p></div>
@@ -194,21 +185,22 @@
 </div>
 
 <script>
-    // اسم المستخدم وكلمة المرور
-    const VALID_USERNAME = "admin";
-    const VALID_PASSWORD = "1234";
+    // كلمة المرور
+    const PASSWORD = "123456";
 
     // بيانات التطبيق
     let appData = {
         items: [
             { id: 1, name: 'Tc-99m Generator', category: 'Radioactive', unit: 'Kit', minStock: 5, active: true },
             { id: 2, name: 'FDG Dose', category: 'Radiopharma', unit: 'Vial', minStock: 10, active: true },
-            { id: 3, name: 'Syringe 5ml', category: 'Consumables', unit: 'Piece', minStock: 50, active: true }
+            { id: 3, name: 'Syringe 5ml', category: 'Consumables', unit: 'Piece', minStock: 50, active: true },
+            { id: 4, name: 'Ga-68 Elution', category: 'Radioactive', unit: 'Bottle', minStock: 4, active: true }
         ],
         batches: [
             { id: 1, itemId: 1, batchNumber: 'B001', qty: 10, originalQty: 10, expDate: '2026-12-10', supplier: 'PharmaCo', location: 'Fridge A', notes: '' },
             { id: 2, itemId: 2, batchNumber: 'B002', qty: 20, originalQty: 20, expDate: '2027-03-15', supplier: 'Medline', location: 'Shelf B', notes: '' },
-            { id: 3, itemId: 3, batchNumber: 'B003', qty: 100, originalQty: 100, expDate: '2028-01-01', supplier: 'Local', location: 'Store 1', notes: '' }
+            { id: 3, itemId: 3, batchNumber: 'B003', qty: 100, originalQty: 100, expDate: '2028-01-01', supplier: 'Local', location: 'Store 1', notes: '' },
+            { id: 4, itemId: 4, batchNumber: 'B004', qty: 5, originalQty: 5, expDate: '2026-09-30', supplier: 'PharmaCo', location: 'Hot Lab', notes: '' }
         ],
         transactions: [
             { id: 1, date: '2026-09-01', time: '10:00', user: 'admin', itemId: 1, batchId: 1, type: 'ADD', qty: 10, prevQty: 0, newQty: 10, reason: 'Initial Stock' },
@@ -216,14 +208,10 @@
         ]
     };
 
-    let editItemId = null;
-
-    // دالة تسجيل الدخول الجديدة
-    function checkLogin() {
-        var user = document.getElementById('usernameInput').value;
-        var pass = document.getElementById('passwordInput').value;
-        
-        if (user === VALID_USERNAME && pass === VALID_PASSWORD) {
+    // دالة تسجيل الدخول
+    function checkPassword() {
+        var input = document.getElementById('passwordInput').value;
+        if (input === PASSWORD) {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContent').classList.remove('hidden');
             loadData();
@@ -237,7 +225,6 @@
     function logout() {
         document.getElementById('appContent').classList.add('hidden');
         document.getElementById('loginScreen').style.display = 'flex';
-        document.getElementById('usernameInput').value = '';
         document.getElementById('passwordInput').value = '';
         document.getElementById('loginError').style.display = 'none';
     }
@@ -257,7 +244,7 @@
         localStorage.setItem('medInventoryData', JSON.stringify(appData));
     }
 
-    // بقية الدوال (نفس الوظائف السابقة)
+    // بقية الدوال (نفس الكود السابق)
     function showSection(sectionId) {
         document.querySelectorAll('main > section').forEach(section => section.classList.add('hidden'));
         document.getElementById(sectionId).classList.remove('hidden');
@@ -278,20 +265,17 @@
         const exp30 = appData.batches.filter(b => { const d = new Date(b.expDate); return d > now && d < new Date(now.getTime() + 30*24*60*60*1000); }).length;
         const exp90 = appData.batches.filter(b => { const d = new Date(b.expDate); return d > now && d < new Date(now.getTime() + 90*24*60*60*1000); }).length;
         const expired = appData.batches.filter(b => new Date(b.expDate) < now).length;
-        
         let lowStockCount = 0;
         appData.items.forEach(item => {
             const totalQtyItem = appData.batches.filter(b => b.itemId === item.id).reduce((sum, b) => sum + b.qty, 0);
             if (totalQtyItem < item.minStock) lowStockCount++;
         });
-
         document.getElementById('statItems').textContent = totalItems;
         document.getElementById('statQty').textContent = totalQty;
         document.getElementById('statExp30').textContent = exp30;
         document.getElementById('statExp90').textContent = exp90;
         document.getElementById('statExpired').textContent = expired;
         document.getElementById('statLow').textContent = lowStockCount;
-
         const recentList = document.getElementById('recentTransactions');
         recentList.innerHTML = appData.transactions.slice(-5).reverse().map(t => {
             const item = appData.items.find(i => i.id === t.itemId);
@@ -373,7 +357,7 @@
         const itemId = Number(document.getElementById('withdrawItemSelect').value);
         const batches = appData.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a, b) => new Date(a.expDate) - new Date(b.expDate));
         document.getElementById('batchWithdrawList').innerHTML = batches.map(b => 
-            `<div class="list-item" style="border:1px solid #00BFFF; padding:10px; margin-bottom:5px;">
+            `<div class="list-item" style="border:1px solid #eee; padding:10px; margin-bottom:5px;">
                 <strong>دفعة: ${b.batchNumber}</strong> | الكمية: ${b.qty} | انتهاء: ${b.expDate}
             </div>`
         ).join('');
@@ -385,23 +369,16 @@
         const reason = document.getElementById('withdrawReason').value;
         if (!qtyToWithdraw || qtyToWithdraw <= 0) { alert('يرجى إدخال كمية صحيحة'); return; }
         if (!confirm(`تأكيد صرف ${qtyToWithdraw} وحدة؟`)) return;
-        
         let remaining = qtyToWithdraw;
         const batchesToUpdate = appData.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a, b) => new Date(a.expDate) - new Date(b.expDate));
-        
         for (const batch of batchesToUpdate) {
             if (remaining <= 0) break;
             const usedQty = Math.min(remaining, batch.qty);
             batch.qty -= usedQty;
             remaining -= usedQty;
-            appData.transactions.push({
-                id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0],
-                user: 'admin', itemId, batchId: batch.id, type: 'WITHDRAW', qty: usedQty, prevQty: batch.qty + usedQty, newQty: batch.qty, reason
-            });
+            appData.transactions.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], time: new Date().toTimeString().split(' ')[0], user: 'admin', itemId, batchId: batch.id, type: 'WITHDRAW', qty: usedQty, prevQty: batch.qty + usedQty, newQty: batch.qty, reason });
         }
-        
         if (remaining > 0) { alert('الكمية المطلوبة غير متوفرة'); }
-        
         saveData();
         renderWithdrawForm();
         showSection('withdraw');
@@ -455,10 +432,8 @@
     function deleteItem() {
         if (!editItemId) return;
         if (!confirm('هل أنت متأكد من حذف الصنف نهائياً؟')) return;
-        
         appData.batches = appData.batches.filter(b => b.itemId !== editItemId);
         appData.items = appData.items.filter(i => i.id !== editItemId);
-        
         saveData();
         closeEditModal();
         renderInventory();
@@ -483,6 +458,8 @@
         a.download = 'inventory_report.csv';
         a.click();
     }
+
+    let editItemId = null;
 </script>
 
 </body>
