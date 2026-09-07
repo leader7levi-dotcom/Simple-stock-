@@ -3,37 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام المخزون</title>
+    <title>نظام إدارة المخزون</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7f6; }
-        .login { max-width: 400px; margin: 100px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center; }
-        .login h1 { color: #1e3a8a; }
-        .login input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .login button { width: 100%; padding: 12px; background: #1e3a8a; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; }
-        .app { display: none; padding: 20px; }
-        .app h1 { color: #1e3a8a; }
+        * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        body { background: #f4f7f6; color: #333; }
+        
+        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e3a8a; display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-box { background: #fff; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .login-box h1 { color: #1e3a8a; margin-bottom: 20px; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 18px; }
+        .login-box button { width: 100%; padding: 12px; background: #1e3a8a; color: #fff; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        
+        .hidden { display: none; }
+        header { background: #1e3a8a; color: #fff; padding: 15px; text-align: center; position: relative; }
+        h1 { font-size: 20px; }
+        nav { display: flex; background: #fff; overflow-x: auto; border-bottom: 2px solid #e0e0e0; position: sticky; top: 0; z-index: 100; }
+        nav button { flex: 1; padding: 12px; background: none; border: none; font-size: 13px; cursor: pointer; font-weight: bold; color: #666; }
+        nav button.active { color: #1e3a8a; border-bottom: 3px solid #1e3a8a; }
+        
+        main { padding: 15px; margin-bottom: 70px; }
+        .card { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .card h3 { color: #1e3a8a; margin-bottom: 10px; }
+        
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        
+        .btn { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 5px; display: inline-block; }
+        .btn-blue { background: #1e3a8a; color: #fff; }
+        .btn-green { background: #10b981; color: #fff; }
+        .btn-red { background: #ef4444; color: #fff; }
+        .btn-grey { background: #e5e7eb; color: #333; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; margin: 2px; }
+        
+        .item-row { border: 1px solid #eee; border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+        .item-row h4 { margin-bottom: 5px; color: #1e3a8a; }
+        .item-row small { color: #777; }
+        .batch-row { border-top: 1px solid #eee; padding: 8px 0; font-size: 13px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .stat-card { background: #fff; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .stat-card.green { border-top: 4px solid #10b981; }
+        .stat-card.yellow { border-top: 4px solid #f59e0b; }
+        .stat-card.red { border-top: 4px solid #ef4444; }
+        .stat-card.blue { border-top: 4px solid #1e3a8a; }
+        .stat-card h3 { font-size: 12px; color: #666; }
+        .stat-card p { font-size: 24px; font-weight: bold; margin-top: 5px; }
+        
+        .fab { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: #1e3a8a; color: #fff; font-size: 30px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 200; }
+        .fab-red { position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: #ef4444; color: #fff; font-size: 30px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.3); cursor: pointer; z-index: 200; }
+        
+        .logout-btn { position: absolute; top: 10px; right: 10px; width: auto; padding: 5px 10px; background: #ef4444; border: none; color: #fff; border-radius: 5px; cursor: pointer; font-size: 12px; }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 500; }
+        .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
+        .modal-content h3 { margin-bottom: 15px; color: #1e3a8a; }
     </style>
 </head>
 <body>
-    <div class="login" id="loginBox">
+
+<div id="loginScreen">
+    <div class="login-box">
         <h1>تسجيل الدخول</h1>
-        <input type="text" id="username" placeholder="اسم المستخدم">
-        <input type="password" id="password" placeholder="كلمة المرور">
-        <button onclick="check()">دخول</button>
+        <input type="text" id="loginUser" placeholder="اسم المستخدم">
+        <input type="password" id="loginPass" placeholder="كلمة المرور">
+        <button onclick="doLogin()">دخول</button>
+        <p style="font-size:12px; color:#888; margin-top:10px;">FAPIPSMADOTA / 1997511KEV</p>
     </div>
-    <div class="app" id="appBox">
-        <h1>تم تسجيل الدخول بنجاح</h1>
-        <p>هنا سيكون نظام المخزون.</p>
+</div>
+
+<div id="app" class="hidden">
+    <header>
+        <h1>نظام المخزون</h1>
+        <button class="logout-btn" onclick="doLogout()">خروج</button>
+    </header>
+
+    <nav>
+        <button class="active" onclick="show('dashboard')">الرئيسية</button>
+        <button onclick="show('items')">الأصناف</button>
+        <button onclick="show('add')">إضافة</button>
+        <button onclick="show('withdraw')">صرف</button>
+        <button onclick="show('history')">السجل</button>
+    </nav>
+
+    <main>
+        <div id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card blue"><h3>عدد الأصناف</h3><p id="st-items">0</p></div>
+                <div class="stat-card green"><h3>إجمالي الكمية</h3><p id="st-qty">0</p></div>
+                <div class="stat-card yellow"><h3>قرب الانتهاء (30)</h3><p id="st-warn">0</p></div>
+                <div class="stat-card red"><h3>منتهي الصلاحية</h3><p id="st-exp">0</p></div>
+            </div>
+            <div class="card">
+                <h3>آخر الحركات</h3>
+                <div id="dash-recent"></div>
+            </div>
+        </div>
+
+        <div id="items" class="hidden">
+            <div class="card">
+                <h3>إضافة صنف جديد</h3>
+                <input type="text" id="i-name" placeholder="اسم الصنف">
+                <input type="text" id="i-cat" placeholder="التصنيف">
+                <input type="number" id="i-min" placeholder="الحد الأدنى">
+                <button class="btn btn-green" onclick="addItem()">إضافة</button>
+            </div>
+            <div id="items-list"></div>
+        </div>
+
+        <div id="add" class="hidden">
+            <div class="card">
+                <h3>إضافة كمية لدفعة</h3>
+                <select id="add-item"></select>
+                <input type="text" id="add-batch" placeholder="رقم الدفعة">
+                <input type="date" id="add-exp">
+                <input type="number" id="add-qty" placeholder="الكمية">
+                <button class="btn btn-green" onclick="doAdd()">إضافة</button>
+            </div>
+        </div>
+
+        <div id="withdraw" class="hidden">
+            <div class="card">
+                <h3>صرف كمية (FEFO)</h3>
+                <select id="w-item" onchange="loadBatches()"></select>
+                <div id="batch-list"></div>
+                <input type="number" id="w-qty" placeholder="الكمية">
+                <button class="btn btn-blue" onclick="doWithdraw()">صرف</button>
+            </div>
+        </div>
+
+        <div id="history" class="hidden">
+            <div class="card">
+                <h3>سجل الحركات</h3>
+                <div id="hist-list"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="editBatchModal" class="modal hidden" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <h3>تعديل دفعة</h3>
+        <label>الكمية</label>
+        <input type="number" id="edit-batch-qty">
+        <label>تاريخ الانتهاء</label>
+        <input type="date" id="edit-batch-exp">
+        <button class="btn btn-green" onclick="saveBatchEdit()" style="width:100%; margin-top:10px;">حفظ</button>
+        <button class="btn btn-red" onclick="deleteBatch()" style="width:100%; margin-top:10px;">حذف الدفعة</button>
+        <button class="btn btn-grey" onclick="closeModal()" style="width:100%; margin-top:10px;">إلغاء</button>
     </div>
-    <script>
-        function check() {
-            if(document.getElementById('username').value === 'FAPIPSMADOTA' && document.getElementById('password').value === '1997511KEV') {
-                document.getElementById('loginBox').style.display = 'none';
-                document.getElementById('appBox').style.display = 'block';
-            } else {
-                alert('بيانات الدخول غير صحيحة');
-            }
+</div>
+
+<script>
+    let data = {
+        items: [
+            { id: 1, name: 'Tc-99m Kit', cat: 'Radioactive', min: 5 },
+            { id: 2, name: 'FDG Vial', cat: 'Radiopharma', min: 10 },
+            { id: 3, name: 'Syringe 5ml', cat: 'Consumable', min: 50 }
+        ],
+        batches: [
+            { id: 1, itemId: 1, batch: 'B001', qty: 10, exp: '2026-12-10', supplier: 'Pharma' },
+            { id: 2, itemId: 1, batch: 'B002', qty: 20, exp: '2027-03-15', supplier: 'Medline' },
+            { id: 3, itemId: 2, batch: 'F001', qty: 15, exp: '2027-01-01', supplier: 'Local' },
+            { id: 4, itemId: 3, batch: 'S001', qty: 100, exp: '2028-01-01', supplier: 'Pharma' }
+        ],
+        history: [],
+        currentUser: null
+    };
+
+    function load() { let saved = localStorage.getItem('inventorySystemData'); if(saved) data = JSON.parse(saved); }
+    function save() { localStorage.setItem('inventorySystemData', JSON.stringify(data)); }
+
+    function doLogin() {
+        let u = document.getElementById('loginUser').value.trim();
+        let p = document.getElementById('loginPass').value.trim();
+        if(u === 'FAPIPSMADOTA' && p === '1997511KEV') {
+            data.currentUser = u; save();
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            loadAll();
+        } else { alert('بيانات الدخول غير صحيحة'); }
+    }
+
+    function doLogout() { data.currentUser = null; save(); location.reload(); }
+
+    function show(section) {
+        document.querySelectorAll('main > div').forEach(el => el.classList.add('hidden'));
+        document.getElementById(section).classList.remove('hidden');
+        document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        loadAll();
+    }
+
+    function loadAll() {
+        let totalQty = 0, warn = 0, exp = 0;
+        const today = new Date();
+        data.batches.forEach(b => {
+            totalQty += b.qty;
+            const d = new Date(b.exp);
+            if(d < today) exp++;
+            else if(d < new Date(today.getTime() + 30*24*60*60*1000)) warn++;
+        });
+        document.getElementById('st-items').textContent = data.items.length;
+        document.getElementById('st-qty').textContent = totalQty;
+        document.getElementById('st-warn').textContent = warn;
+        document.getElementById('st-exp').textContent = exp;
+
+        let recent = data.history.slice(-5).reverse().map(h => `<div style="border-bottom:1px solid #eee; padding:5px;">${h.user || 'system'} - ${h.type} - ${h.itemName} - كمية: ${h.qty}</div>`).join('');
+        document.getElementById('dash-recent').innerHTML = recent || 'لا توجد حركات';
+
+        let itemsHtml = '';
+        data.items.forEach(i => {
+            let itemBatches = data.batches.filter(b => b.itemId === i.id);
+            let totalStock = itemBatches.reduce((a,b) => a+b.qty, 0);
+            itemsHtml += `<div class="item-row">
+                <h4>${i.name} ${totalStock < i.min ? '<span style="color:red;">(نقص)</span>' : ''}</h4>
+                <small>${i.cat} | المخزون: ${totalStock} | الحد الأدنى: ${i.min}</small>
+                <div style="margin-top:10px;">
+                    ${itemBatches.map(b => `
+                        <div class="batch-row">
+                            دفعة: ${b.batch} | كمية: ${b.qty} | انتهاء: ${b.exp}
+                            <button class="btn btn-sm btn-blue" onclick="openEditBatch(${b.id})">تعديل</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        });
+        document.getElementById('items-list').innerHTML = itemsHtml;
+
+        let opt = data.items.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
+        document.getElementById('add-item').innerHTML = opt;
+        document.getElementById('w-item').innerHTML = opt;
+    }
+
+    function addItem() {
+        let name = document.getElementById('i-name').value.trim();
+        if(!name) return alert('أدخل اسم الصنف');
+        data.items.push({ id: Date.now(), name, cat: document.getElementById('i-cat').value, min: +document.getElementById('i-min').value || 0 });
+        save(); loadAll();
+        document.getElementById('i-name').value = ''; document.getElementById('i-cat').value = ''; document.getElementById('i-min').value = '';
+        alert('تمت الإضافة');
+    }
+
+    function doAdd() {
+        let itemId = +document.getElementById('add-item').value;
+        let batchNo = document.getElementById('add-batch').value;
+        let exp = document.getElementById('add-exp').value;
+        let qty = +document.getElementById('add-qty').value;
+        if(!batchNo || !exp || !qty) return alert('أكمل البيانات');
+        let b = data.batches.find(x => x.batch === batchNo && x.itemId === itemId);
+        if(b) b.qty += qty;
+        else data.batches.push({ id: Date.now(), itemId, batch: batchNo, qty, exp, supplier: '' });
+        let i = data.items.find(x => x.id === itemId);
+        data.history.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], type: 'ADD', user: data.currentUser, itemName: i.name, qty });
+        save(); loadAll();
+        alert('تمت الإضافة');
+    }
+
+    function loadBatches() {
+        let id = +document.getElementById('w-item').value;
+        let bs = data.batches.filter(b => b.itemId === id && b.qty > 0).sort((a,b) => new Date(a.exp) - new Date(b.exp));
+        let h = '<h4>الدفعات المتاحة:</h4>';
+        bs.forEach(b => { h += `<div>${b.batch} | كمية: ${b.qty} | انتهاء: ${b.exp}</div>`; });
+        document.getElementById('batch-list').innerHTML = h;
+    }
+
+    function doWithdraw() {
+        let itemId = +document.getElementById('w-item').value;
+        let qty = +document.getElementById('w-qty').value;
+        if(!qty) return alert('أدخل الكمية');
+        let bs = data.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a,b) => new Date(a.exp) - new Date(b.exp));
+        let remaining = qty;
+        let i = data.items.find(x => x.id === itemId);
+        for(let b of bs) {
+            if(remaining === 0) break;
+            let take = Math.min(remaining, b.qty);
+            b.qty -= take;
+            remaining -= take;
+            data.history.push({ id: Date.now(), date: new Date().toISOString().split('T')[0], type: 'WITHDRAW', user: data.currentUser, itemName: i.name, qty: take });
         }
-    </script>
+        if(remaining > 0) return alert('الكمية المطلوبة أكبر من المتوفر');
+        save(); loadAll();
+        alert('تم الصرف');
+    }
+
+    let editingBatchId = null;
+    function openEditBatch(id) {
+        editingBatchId = id;
+        let b = data.batches.find(x => x.id === id);
+        document.getElementById('edit-batch-qty').value = b.qty;
+        document.getElementById('edit-batch-exp').value = b.exp;
+        document.getElementById('editBatchModal').classList.remove('hidden');
+    }
+
+    function saveBatchEdit() {
+        if(!editingBatchId) return;
+        let b = data.batches.find(x => x.id === editingBatchId);
+        b.qty = +document.getElementById('edit-batch-qty').value;
+        b.exp = document.getElementById('edit-batch-exp').value;
+        save(); loadAll(); closeModal();
+        alert('تم الحفظ');
+    }
+
+    function deleteBatch() {
+        if(!editingBatchId) return;
+        if(!confirm('حذف هذه الدفعة؟')) return;
+        data.batches = data.batches.filter(x => x.id !== editingBatchId);
+        save(); loadAll(); closeModal();
+        alert('تم الحذف');
+    }
+
+    function closeModal() { document.getElementById('editBatchModal').classList.add('hidden'); }
+
+    load();
+    if(data.currentUser) {
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('app').classList.remove('hidden');
+        loadAll();
+    }
+</script>
+
 </body>
 </html>
