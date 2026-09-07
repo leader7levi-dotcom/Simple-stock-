@@ -1,107 +1,741 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام المخزون الاحترافي</title>
-    <style>
-        * { box-sizing: border-box; font-family: Arial, sans-serif; margin: 0; padding: 0; }
-        body { background: #f4f7f6; color: #333; }
-        #loginScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1e3a8a; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-box { background: #fff; padding: 30px; border-radius: 15px; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .login-box h1 { color: #1e3a8a; margin-bottom: 20px; }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 18px; }
-        .login-box button { width: 100%; padding: 12px; background: #1e3a8a; color: #fff; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
-        .hidden { display: none; }
-        header { background: #1e3a8a; color: #fff; padding: 15px; text-align: center; position: relative; }
-        nav { display: flex; background: #fff; overflow-x: auto; border-bottom: 2px solid #e0e0e0; }
-        nav button { flex: 1; padding: 12px; background: none; border: none; font-size: 13px; cursor: pointer; font-weight: bold; color: #666; }
-        nav button.active { color: #1e3a8a; border-bottom: 3px solid #1e3a8a; }
-        main { padding: 15px; margin-bottom: 70px; }
-        .card { background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        .card h3 { color: #1e3a8a; margin-bottom: 10px; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-        .btn { padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-top: 5px; display: inline-block; }
-        .btn-blue { background: #1e3a8a; color: #fff; }
-        .btn-green { background: #10b981; color: #fff; }
-        .btn-red { background: #ef4444; color: #fff; }
-        .btn-grey { background: #e5e7eb; color: #333; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; margin: 2px; }
-        .item-row { border-bottom: 1px solid #eee; padding: 10px 0; }
-        .batch-row { border-top: 1px solid #eee; padding: 8px 0; font-size: 13px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .stat-card { background: #fff; border-radius: 10px; padding: 15px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .stat-card h3 { font-size: 12px; color: #666; }
-        .stat-card p { font-size: 24px; font-weight: bold; margin-top: 5px; }
-        .logout-btn { position: absolute; top: 10px; right: 10px; width: auto; padding: 5px 10px; background: #ef4444; border: none; color: #fff; border-radius: 5px; cursor: pointer; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nucleus Stockroom</title>
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#f4f7f6;color:#333}
+.hidden{display:none!important}
+button,input,select{font:inherit}
+#loginScreen{position:fixed;inset:0;background:#1e3a8a;display:flex;align-items:center;justify-content:center;z-index:9999}
+.login-box,.card,.item{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 8px #0001}
+.login-box{width:92%;max-width:380px}.login-box h1{text-align:center;color:#1e3a8a}
+input,select{width:100%;padding:11px;margin:5px 0;border:1px solid #ccc;border-radius:7px}
+header{background:#1e3a8a;color:white;padding:16px;text-align:center;position:relative}
+header h1{margin:0;font-size:20px}
+.logout{position:absolute;right:10px;top:10px;background:#ef4444;color:white;border:0;border-radius:6px;padding:6px 10px}
+nav{display:flex;background:white;position:sticky;top:0;z-index:100;overflow-x:auto;border-bottom:2px solid #ddd}
+nav button{flex:1;min-width:75px;padding:12px 6px;border:0;background:none;font-weight:bold;color:#666}
+nav button.active{color:#1e3a8a;border-bottom:3px solid #1e3a8a}
+main{padding:15px;margin-bottom:70px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{text-align:center;background:white;border-radius:10px;padding:15px;box-shadow:0 2px 5px #0001}
+.stat p{font-size:24px;font-weight:bold;margin:5px}
+.btn{border:0;border-radius:8px;padding:9px 12px;margin:3px;cursor:pointer}
+.blue{background:#1e3a8a;color:white}.green{background:#10b981;color:white}
+.red{background:#ef4444;color:white}.gray{background:#e5e7eb;color:#333}
+.item{margin:10px 0}.item h3{color:#1e3a8a;margin:0 0 6px}
+.batch{border-top:1px solid #eee;padding:9px 0;font-size:13px}
+.badge{display:inline-block;border-radius:10px;padding:3px 7px;font-size:11px}
+.ok{background:#dcfce7;color:#166534}.warn{background:#fef3c7;color:#92400e}.danger{background:#fee2e2;color:#b91c1c}
+.modal{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;z-index:500}
+.modal-box{background:white;border-radius:12px;padding:20px;width:92%;max-width:420px}
+.empty{text-align:center;color:#777;padding:20px}
+.fab{position:fixed;right:20px;bottom:20px;width:58px;height:58px;border:0;border-radius:50%;background:#1e3a8a;color:white;font-size:28px}
+</style>
 </head>
 <body>
+
 <div id="loginScreen">
-    <div class="login-box">
-        <h1>تسجيل الدخول</h1>
-        <input type="text" id="loginUser" placeholder="اسم المستخدم">
-        <input type="password" id="loginPass" placeholder="كلمة المرور">
-        <button onclick="doLogin()">دخول</button>
-        <p style="font-size:12px; color:#888; margin-top:10px;">FAPIPSMADOTA / 1997511KEV</p>
-    </div>
+<div class="login-box">
+<h1>تسجيل الدخول</h1>
+<input id="user" placeholder="اسم المستخدم">
+<input id="pass" type="password" placeholder="كلمة المرور">
+<button class="btn blue" style="width:100%" onclick="login()">دخول</button>
+<p style="font-size:12px;color:#888;text-align:center">Nucleus Stockroom</p>
 </div>
+</div>
+
 <div id="app" class="hidden">
-    <header><h1>نظام المخزون</h1><button class="logout-btn" onclick="doLogout()">خروج</button></header>
-    <nav>
-        <button class="active" onclick="show('dashboard')">الرئيسية</button>
-        <button onclick="show('items')">الأصناف</button>
-        <button onclick="show('add')">إضافة</button>
-        <button onclick="show('withdraw')">صرف</button>
-        <button onclick="show('history')">السجل</button>
-    </nav>
-    <main>
-        <div id="dashboard">
-            <div class="stats-grid">
-                <div class="stat-card"><h3>عدد الأصناف</h3><p id="st-items">0</p></div>
-                <div class="stat-card"><h3>إجمالي الكمية</h3><p id="st-qty">0</p></div>
-                <div class="stat-card"><h3>قرب الانتهاء (30)</h3><p id="st-warn">0</p></div>
-                <div class="stat-card"><h3>منتهي الصلاحية</h3><p id="st-exp">0</p></div>
-            </div>
-            <div class="card"><h3>آخر الحركات</h3><div id="dash-recent"></div></div>
-        </div>
-        <div id="items" class="hidden">
-            <div class="card"><h3>إضافة صنف جديد</h3><input type="text" id="i-name" placeholder="اسم الصنف"><input type="text" id="i-cat" placeholder="التصنيف"><input type="number" id="i-min" placeholder="الحد الأدنى"><button class="btn btn-green" onclick="addItem()">إضافة</button></div>
-            <div id="items-list"></div>
-        </div>
-        <div id="add" class="hidden">
-            <div class="card"><h3>إضافة كمية لدفعة</h3><select id="add-item"></select><input type="text" id="add-batch" placeholder="رقم الدفعة"><input type="date" id="add-exp"><input type="number" id="add-qty" placeholder="الكمية"><button class="btn btn-green" onclick="doAdd()">إضافة</button></div>
-        </div>
-        <div id="withdraw" class="hidden">
-            <div class="card"><h3>صرف كمية (FEFO)</h3><select id="w-item" onchange="loadBatches()"></select><div id="batch-list"></div><input type="number" id="w-qty" placeholder="الكمية"><button class="btn btn-blue" onclick="doWithdraw()">صرف</button></div>
-        </div>
-        <div id="history" class="hidden"><div class="card"><h3>سجل الحركات</h3><div id="hist-list"></div></div></div>
-    </main>
+<header><h1>Nucleus Stockroom</h1><button class="logout" onclick="logout()">خروج</button></header>
+<nav>
+<button class="active" onclick="showPage('dashboard',this)">الرئيسية</button>
+<button onclick="showPage('items',this)">الأصناف</button>
+<button onclick="showPage('add',this)">إضافة</button>
+<button onclick="showPage('withdraw',this)">صرف</button>
+<button onclick="showPage('history',this)">السجل</button>
+</nav>
+
+<main>
+<section id="dashboard">
+<div class="stats">
+<div class="stat">عدد الأصناف<p id="countItems">0</p></div>
+<div class="stat">إجمالي الكمية<p id="totalQty">0</p></div>
+<div class="stat">قرب الانتهاء ≤30 يوم<p id="warning">0</p></div>
+<div class="stat">منتهي الصلاحية<p id="expired">0</p></div>
 </div>
+
+<div class="card" style="margin-top:15px">
+<h3>آخر الحركات</h3>
+<div id="recent"></div>
+</div>
+</section>
+
+<section id="items" class="hidden">
+<div class="card">
+<h3>إضافة صنف جديد</h3>
+<input id="newName" placeholder="اسم الصنف">
+<input id="newCat" placeholder="التصنيف">
+<input id="newMin" type="number" min="0" placeholder="الحد الأدنى">
+<button class="btn green" onclick="addItem()">إضافة</button>
+</div>
+
+<div class="card">
+<input id="search" placeholder="بحث عن صنف..." oninput="renderItems()">
+</div>
+
+<div id="itemsList"></div>
+</section>
+
+<section id="add" class="hidden">
+<div class="card">
+<h3>إضافة كمية / دفعة</h3>
+<select id="addItem"></select>
+<input id="addBatch" placeholder="رقم الدفعة">
+<input id="addExp" type="date">
+<input id="addQty" type="number" min="1" placeholder="الكمية">
+<input id="addSupplier" placeholder="المورد">
+<button class="btn green" onclick="addStock()">إضافة</button>
+</div>
+</section>
+
+<section id="withdraw" class="hidden">
+<div class="card">
+<h3>صرف كمية — FEFO</h3>
+<select id="withdrawItem" onchange="renderAvailable()"></select>
+<div id="available"></div>
+<input id="withdrawQty" type="number" min="1" placeholder="الكمية المطلوبة">
+<button class="btn blue" onclick="withdrawStock()">صرف</button>
+</div>
+</section>
+
+<section id="history" class="hidden">
+<div class="card">
+<h3>سجل الحركات</h3>
+<input id="historySearch" placeholder="بحث..." oninput="renderHistory()">
+<div id="historyList"></div>
+</div>
+</section>
+</main>
+
+<button class="fab" onclick="showPage('add',document.querySelectorAll('nav button')[2])">+</button>
+</div>
+
+<div id="itemModal" class="modal hidden" onclick="closeItemModal()">
+<div class="modal-box" onclick="event.stopPropagation()">
+<h3>تعديل الصنف</h3>
+<input id="editName" placeholder="اسم الصنف">
+<input id="editCat" placeholder="التصنيف">
+<input id="editMin" type="number" min="0" placeholder="الحد الأدنى">
+
+<button class="btn green" style="width:100%" onclick="saveItem()">حفظ</button>
+<button class="btn red" style="width:100%" onclick="archiveItem()">أرشفة</button>
+<button class="btn gray" style="width:100%" onclick="closeItemModal()">إلغاء</button>
+</div>
+</div>
+
+<div id="batchModal" class="modal hidden" onclick="closeBatchModal()">
+<div class="modal-box" onclick="event.stopPropagation()">
+<h3>تعديل الدفعة</h3>
+<input id="editQty" type="number" min="0" placeholder="الكمية">
+<input id="editExp" type="date">
+<input id="editSupplier" placeholder="المورد">
+
+<button class="btn green" style="width:100%" onclick="saveBatch()">حفظ</button>
+<button class="btn red" style="width:100%" onclick="deleteBatch()">حذف الدفعة</button>
+<button class="btn gray" style="width:100%" onclick="closeBatchModal()">إلغاء</button>
+</div>
+</div>
+
 <script>
-    let data = { items: [{ id: 1, name: 'Tc-99m Kit', cat: 'Radioactive', min: 5 }, { id: 2, name: 'FDG Vial', cat: 'Radiopharma', min: 10 }, { id: 3, name: 'Syringe 5ml', cat: 'Consumable', min: 50 }], batches: [{ id: 1, itemId: 1, batch: 'B001', qty: 10, exp: '2026-12-10' }, { id: 2, itemId: 1, batch: 'B002', qty: 20, exp: '2027-03-15' }], history: [], currentUser: null };
-    function load() { let saved = localStorage.getItem('invData'); if(saved) data = JSON.parse(saved); }
-    function save() { localStorage.setItem('invData', JSON.stringify(data)); }
-    function doLogin() { let u = document.getElementById('loginUser').value.trim(); let p = document.getElementById('loginPass').value.trim(); if(u === 'FAPIPSMADOTA' && p === '1997511KEV') { data.currentUser = u; save(); document.getElementById('loginScreen').style.display = 'none'; document.getElementById('app').classList.remove('hidden'); loadAll(); } else { alert('بيانات غير صحيحة'); } }
-    function doLogout() { data.currentUser = null; save(); location.reload(); }
-    function show(section) { document.querySelectorAll('main > div').forEach(el => el.classList.add('hidden')); document.getElementById(section).classList.remove('hidden'); loadAll(); }
-    function loadAll() {
-        let totalQty = 0, warn = 0, exp = 0; const today = new Date();
-        data.batches.forEach(b => { totalQty += b.qty; const d = new Date(b.exp); if(d < today) exp++; else if(d < new Date(today.getTime() + 30*24*60*60*1000)) warn++; });
-        document.getElementById('st-items').textContent = data.items.length; document.getElementById('st-qty').textContent = totalQty; document.getElementById('st-warn').textContent = warn; document.getElementById('st-exp').textContent = exp;
-        let recent = data.history.slice(-5).reverse().map(h => `<div>${h.user} - ${h.type} - ${h.itemName} - ${h.qty}</div>`).join(''); document.getElementById('dash-recent').innerHTML = recent || 'لا توجد حركات';
-        let itemsHtml = ''; data.items.forEach(i => { let itemBatches = data.batches.filter(b => b.itemId === i.id); let totalStock = itemBatches.reduce((a,b) => a+b.qty, 0); itemsHtml += `<div class="item-row"><h4>${i.name}</h4><small>${i.cat} | المخزون: ${totalStock} | الحد الأدنى: ${i.min}</small><br>`; itemBatches.forEach(b => { itemsHtml += `<div class="batch-row">دفعة: ${b.batch} | كمية: ${b.qty} | انتهاء: ${b.exp} <button class="btn btn-sm btn-blue" onclick="openEditBatch(${b.id})">تعديل</button></div>`; }); itemsHtml += `<br><button class="btn btn-sm btn-red" onclick="deleteItem(${i.id})">حذف الصنف</button></div>`; }); document.getElementById('items-list').innerHTML = itemsHtml;
-        let opt = data.items.map(i => `<option value="${i.id}">${i.name}</option>`).join(''); document.getElementById('add-item').innerHTML = opt; document.getElementById('w-item').innerHTML = opt;
-    }
-    function addItem() { let name = document.getElementById('i-name').value.trim(); if(!name) return alert('أدخل اسم الصنف'); data.items.push({ id: Date.now(), name, cat: document.getElementById('i-cat').value, min: +document.getElementById('i-min').value || 0 }); save(); loadAll(); alert('تمت الإضافة'); }
-    function doAdd() { let itemId = +document.getElementById('add-item').value; let batchNo = document.getElementById('add-batch').value; let exp = document.getElementById('add-exp').value; let qty = +document.getElementById('add-qty').value; if(!batchNo || !exp || !qty) return alert('أكمل البيانات'); let b = data.batches.find(x => x.batch === batchNo && x.itemId === itemId); if(b) b.qty += qty; else data.batches.push({ id: Date.now(), itemId, batch: batchNo, qty, exp }); let i = data.items.find(x => x.id === itemId); data.history.push({ id: Date.now(), user: data.currentUser, itemName: i.name, batch: batchNo, type: 'ADD', qty }); save(); loadAll(); alert('تمت الإضافة'); }
-    function loadBatches() { let id = +document.getElementById('w-item').value; let bs = data.batches.filter(b => b.itemId === id && b.qty > 0).sort((a,b) => new Date(a.exp) - new Date(b.exp)); let h = '<h4>الدفعات المتاحة:</h4>'; bs.forEach(b => { h += `<div>${b.batch} | كمية: ${b.qty} | انتهاء: ${b.exp}</div>`; }); document.getElementById('batch-list').innerHTML = h; }
-    function doWithdraw() { let itemId = +document.getElementById('w-item').value; let qty = +document.getElementById('w-qty').value; if(!qty) return alert('أدخل الكمية'); let bs = data.batches.filter(b => b.itemId === itemId && b.qty > 0).sort((a,b) => new Date(a.exp) - new Date(b.exp)); let remaining = qty; let i = data.items.find(x => x.id === itemId); for(let b of bs) { if(remaining === 0) break; let take = Math.min(remaining, b.qty); b.qty -= take; remaining -= take; data.history.push({ id: Date.now(), user: data.currentUser, itemName: i.name, batch: b.batch, type: 'WITHDRAW', qty: take }); } if(remaining > 0) return alert('الكمية المطلوبة أكبر من المتوفر'); save(); loadAll(); alert('تم الصرف'); }
-    function deleteItem(id) { if(!confirm('حذف الصنف؟')) return; data.items = data.items.filter(i => i.id !== id); data.batches = data.batches.filter(b => b.itemId !== id); save(); loadAll(); }
-    let editingBatchId = null;
-    function openEditBatch(id) { editingBatchId = id; let b = data.batches.find(x => x.id === id); let q = prompt('الكمية الجديدة', b.qty); let e = prompt('تاريخ الانتهاء الجديد (YYYY-MM-DD)', b.exp); if(q !== null && e !== null) { b.qty = +q; b.exp = e; save(); loadAll(); } }
-    load();
-    if(data.currentUser) { document.getElementById('loginScreen').style.display = 'none'; document.getElementById('app').classList.remove('hidden'); loadAll(); }
+const KEY='nucleus_stockroom_v3';
+
+let data={
+items:[],
+batches:[],
+history:[],
+user:null
+};
+
+let editItemId=null;
+let editBatchId=null;
+
+function load(){
+try{
+const x=localStorage.getItem(KEY);
+if(x)data=JSON.parse(x);
+}catch(e){}
+}
+
+function save(){
+localStorage.setItem(KEY,JSON.stringify(data));
+}
+
+function esc(x){
+return String(x??'').replace(/[&<>"']/g,c=>({
+'&':'&amp;',
+'<':'&lt;',
+'>':'&gt;',
+'"':'&quot;',
+"'":'&#39;'
+}[c]));
+}
+
+function login(){
+const u=document.getElementById('user').value.trim();
+const p=document.getElementById('pass').value;
+
+if(u==='FAPIPSMADOTA'&&p==='1997511KEV'){
+data.user=u;
+save();
+
+document.getElementById('loginScreen').classList.add('hidden');
+document.getElementById('app').classList.remove('hidden');
+
+refresh();
+}else{
+alert('بيانات الدخول غير صحيحة');
+}
+}
+
+function logout(){
+data.user=null;
+save();
+location.reload();
+}
+
+function showPage(id,btn){
+document.querySelectorAll('main>section').forEach(x=>x.classList.add('hidden'));
+
+document.getElementById(id).classList.remove('hidden');
+
+document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+
+if(btn)btn.classList.add('active');
+
+refresh();
+}
+
+function days(exp){
+return Math.ceil(
+(
+new Date(exp).setHours(0,0,0,0)-
+new Date().setHours(0,0,0,0)
+)/86400000
+);
+}
+
+function badge(exp,qty){
+const d=days(exp);
+
+if(qty<=0)
+return '<span class="badge danger">نفد</span>';
+
+if(d<0)
+return '<span class="badge danger">منتهي</span>';
+
+if(d<=30)
+return '<span class="badge warn">قريب الانتهاء</span>';
+
+return '<span class="badge ok">جيد</span>';
+}
+
+function refresh(){
+
+const active=data.items.filter(i=>i.active!==false);
+
+let total=0;
+let w=0;
+let e=0;
+
+data.batches.forEach(b=>{
+total+=Number(b.qty)||0;
+
+const d=days(b.exp);
+
+if(d<0)e++;
+else if(d<=30)w++;
+});
+
+countItems.textContent=active.length;
+totalQty.textContent=total;
+warning.textContent=w;
+expired.textContent=e;
+
+renderRecent();
+renderItems();
+renderSelects();
+renderHistory();
+}
+
+function renderRecent(){
+
+const a=data.history.slice(-5).reverse();
+
+recent.innerHTML=a.length
+?a.map(h=>`
+<div style="padding:7px;border-bottom:1px solid #eee">
+${esc(h.user)} — ${esc(h.type)} — ${esc(h.item)} — ${h.qty}
+${h.batch?' — '+esc(h.batch):''}
+</div>
+`).join('')
+:'<div class="empty">لا توجد حركات</div>';
+}
+
+function renderItems(){
+
+const q=(document.getElementById('search')?.value||'').toLowerCase();
+
+const a=data.items.filter(i=>
+i.active!==false &&
+i.name.toLowerCase().includes(q)
+);
+
+itemsList.innerHTML=a.length
+?a.map(i=>{
+
+const bs=data.batches.filter(b=>b.itemId===i.id);
+
+const total=bs.reduce(
+(s,b)=>s+Number(b.qty),0
+);
+
+return `
+<div class="item">
+
+<h3>
+${esc(i.name)}
+${total<i.min?'<span class="badge danger">نقص</span>':''}
+</h3>
+
+<small>
+${esc(i.cat||'')} |
+المخزون: ${total} |
+الحد الأدنى: ${i.min}
+</small>
+
+${
+bs.length
+?bs.map(b=>`
+<div class="batch">
+
+<b>${esc(b.batch)}</b> |
+كمية: ${b.qty} |
+انتهاء: ${esc(b.exp)}
+${badge(b.exp,b.qty)}
+
+<button class="btn gray"
+onclick="openBatch(${b.id})">
+تعديل
+</button>
+
+</div>
+`).join('')
+:'<div class="empty">لا توجد دفعات</div>'
+}
+
+<button class="btn blue"
+onclick="openItem(${i.id})">
+تعديل الصنف
+</button>
+
+</div>
+`;
+
+}).join('')
+:'<div class="card empty">لا توجد أصناف</div>';
+}
+
+function renderSelects(){
+
+const a=data.items.filter(i=>i.active!==false);
+
+const o=a.map(i=>
+`<option value="${i.id}">${esc(i.name)}</option>`
+).join('');
+
+addItem.innerHTML=o||'<option value="">لا توجد أصناف</option>';
+
+withdrawItem.innerHTML=o||'<option value="">لا توجد أصناف</option>';
+
+renderAvailable();
+}
+
+function addItem(){
+
+const name=newName.value.trim();
+
+if(!name)
+return alert('أدخل اسم الصنف');
+
+const i={
+id:Date.now(),
+name,
+cat:newCat.value.trim(),
+min:Number(newMin.value)||0,
+active:true
+};
+
+data.items.push(i);
+
+historyAdd(
+'ADD_ITEM',
+i.name,
+0
+);
+
+save();
+refresh();
+
+newName.value='';
+newCat.value='';
+newMin.value='';
+
+alert('تمت إضافة الصنف');
+}
+
+function addStock(){
+
+const itemId=Number(addItem.value);
+const batch=addBatch.value.trim();
+const exp=addExp.value;
+const qty=Number(addQty.value);
+const supplier=addSupplier.value.trim();
+
+if(!itemId||!batch||!exp||qty<=0)
+return alert('أكمل البيانات بشكل صحيح');
+
+let b=data.batches.find(
+x=>x.itemId===itemId&&x.batch===batch
+);
+
+if(b){
+
+b.qty+=qty;
+b.exp=exp;
+
+if(supplier)
+b.supplier=supplier;
+
+}else{
+
+data.batches.push({
+id:Date.now(),
+itemId,
+batch,
+qty,
+exp,
+supplier
+});
+
+}
+
+const i=data.items.find(x=>x.id===itemId);
+
+historyAdd(
+'ADD',
+i.name,
+qty,
+batch
+);
+
+save();
+refresh();
+
+addBatch.value='';
+addExp.value='';
+addQty.value='';
+addSupplier.value='';
+
+alert('تمت الإضافة');
+}
+
+function renderAvailable(){
+
+const id=Number(withdrawItem.value);
+
+const bs=data.batches
+.filter(b=>b.itemId===id&&b.qty>0)
+.sort(
+(a,b)=>new Date(a.exp)-new Date(b.exp)
+);
+
+available.innerHTML=bs.length
+?'<b>الدفعات حسب FEFO:</b>'+
+bs.map(b=>`
+<div style="padding:6px;border-bottom:1px solid #eee">
+${esc(b.batch)} |
+${b.qty} |
+${esc(b.exp)}
+${badge(b.exp,b.qty)}
+</div>
+`).join('')
+:'<div class="empty">لا توجد كمية متاحة</div>';
+}
+
+function withdrawStock(){
+
+const id=Number(withdrawItem.value);
+const qty=Number(withdrawQty.value);
+
+if(!id||qty<=0)
+return alert('أدخل كمية صحيحة');
+
+const bs=data.batches
+.filter(b=>b.itemId===id&&b.qty>0)
+.sort(
+(a,b)=>new Date(a.exp)-new Date(b.exp)
+);
+
+const availableQty=bs.reduce(
+(s,b)=>s+Number(b.qty),0
+);
+
+// الإصلاح المهم:
+// نتحقق من الكمية قبل أي خصم.
+if(qty>availableQty)
+return alert(
+'الكمية المطلوبة أكبر من المتوفر. المتوفر: '+
+availableQty
+);
+
+let rem=qty;
+
+const i=data.items.find(x=>x.id===id);
+
+const moves=[];
+
+for(const b of bs){
+
+if(!rem)break;
+
+const take=Math.min(rem,b.qty);
+
+b.qty-=take;
+rem-=take;
+
+moves.push([
+b.batch,
+take
+]);
+}
+
+moves.forEach(x=>
+historyAdd(
+'WITHDRAW',
+i.name,
+x[1],
+x[0]
+)
+);
+
+save();
+refresh();
+
+withdrawQty.value='';
+
+alert('تم الصرف بنجاح حسب FEFO');
+}
+
+function historyAdd(
+type,
+item,
+qty,
+batch=''
+){
+
+data.history.push({
+id:Date.now()+Math.random(),
+date:new Date().toISOString(),
+type,
+item,
+qty,
+batch,
+user:data.user||'system'
+});
+}
+
+function renderHistory(){
+
+const q=(historySearch?.value||'').toLowerCase();
+
+const a=data.history
+.slice()
+.reverse()
+.filter(h=>
+(
+h.type+' '+
+h.item+' '+
+h.batch+' '+
+h.user
+).toLowerCase().includes(q)
+);
+
+historyList.innerHTML=a.length
+?a.map(h=>`
+<div style="padding:9px;border-bottom:1px solid #eee">
+
+<b>${esc(h.type)}</b> —
+${esc(h.item)} —
+${h.qty}
+
+${h.batch?
+' — دفعة: '+esc(h.batch)
+:''}
+
+<br>
+
+<small>
+${new Date(h.date).toLocaleString('ar-IQ')}
+—
+${esc(h.user)}
+</small>
+
+</div>
+`).join('')
+:'<div class="empty">لا توجد حركات</div>';
+}
+
+function openItem(id){
+
+editItemId=id;
+
+const i=data.items.find(x=>x.id===id);
+
+if(!i)return;
+
+editName.value=i.name;
+editCat.value=i.cat||'';
+editMin.value=i.min||0;
+
+itemModal.classList.remove('hidden');
+}
+
+function saveItem(){
+
+const i=data.items.find(
+x=>x.id===editItemId
+);
+
+const name=editName.value.trim();
+
+if(!i||!name)
+return alert('أدخل اسم الصنف');
+
+i.name=name;
+i.cat=editCat.value.trim();
+i.min=Number(editMin.value)||0;
+
+save();
+
+closeItemModal();
+refresh();
+
+alert('تم التعديل');
+}
+
+function archiveItem(){
+
+const i=data.items.find(
+x=>x.id===editItemId
+);
+
+if(!i)return;
+
+if(!confirm(
+'أرشفة الصنف؟ سيبقى السجل محفوظًا.'
+))
+return;
+
+i.active=false;
+
+save();
+closeItemModal();
+refresh();
+
+alert('تمت الأرشفة');
+}
+
+function closeItemModal(){
+itemModal.classList.add('hidden');
+}
+
+function openBatch(id){
+
+editBatchId=id;
+
+const b=data.batches.find(
+x=>x.id===id
+);
+
+if(!b)return;
+
+editQty.value=b.qty;
+editExp.value=b.exp;
+editSupplier.value=b.supplier||'';
+
+batchModal.classList.remove('hidden');
+}
+
+function saveBatch(){
+
+const b=data.batches.find(
+x=>x.id===editBatchId
+);
+
+const q=Number(editQty.value);
+
+if(!b||q<0||!editExp.value)
+return alert('أدخل البيانات بشكل صحيح');
+
+b.qty=q;
+b.exp=editExp.value;
+b.supplier=editSupplier.value.trim();
+
+save();
+
+closeBatchModal();
+refresh();
+
+alert('تم تعديل الدفعة');
+}
+
+function deleteBatch(){
+
+if(!confirm(
+'هل أنت متأكد من حذف الدفعة؟'
+))
+return;
+
+data.batches=data.batches.filter(
+x=>x.id!==editBatchId
+);
+
+save();
+
+closeBatchModal();
+refresh();
+
+alert('تم حذف الدفعة');
+}
+
+function closeBatchModal(){
+batchModal.classList.add('hidden');
+}
+
+load();
+
+if(data.user){
+
+loginScreen.classList.add('hidden');
+app.classList.remove('hidden');
+
+}
+
+refresh();
 </script>
+
 </body>
 </html>
